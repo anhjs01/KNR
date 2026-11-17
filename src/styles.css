@@ -631,3 +631,15 @@ main#inicio{scroll-margin-top:82px}
  .checkout-fields input{min-height:48px}
  .checkout-modal .checkout-order-review{margin-top:12px}
 }
+
+
+/* Checkout: revisión explícita antes de salir a WhatsApp */
+.checkout-delivery-review{margin:18px 0;padding:16px;background:var(--bg);border:1px solid var(--accent);border-radius:2px}
+.checkout-review-data{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;padding:15px 0}
+.checkout-review-data>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.checkout-review-data small{font-size:9px;color:var(--muted);letter-spacing:.5px}
+.checkout-review-data strong{font-size:12px;color:var(--text);overflow-wrap:anywhere;font-weight:600}
+.checkout-edit{display:inline-flex;align-items:center;gap:8px;padding:9px 0;border:0;border-top:1px solid var(--line);background:transparent;color:var(--accent);font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer}
+.checkout-edit svg{transform:rotate(180deg)}
+.checkout-modal .btn-primary[type=submit]{min-height:52px}
+@media(max-width:600px){.checkout-review-data{grid-template-columns:1fr;gap:11px;padding:13px 0}.checkout-delivery-review{padding:13px;margin:14px 0}.checkout-review-data strong{font-size:13px}}
