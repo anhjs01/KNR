@@ -90,3 +90,8 @@ En `/admin`, cada producto con control de inventario permite configurar un punto
 - La ficha permite recorrer las imágenes mediante miniaturas seleccionables y muestra el contador de la galería.
 - Presenta descuento y disponibilidad/inventario cuando el producto tiene control de stock.
 - Las tarjetas del catálogo cargan imágenes de forma diferida y muestran una etiqueta de agotado cuando corresponde.
+
+### Carrito y resumen de compra
+- El carrito presenta el precio de lista, el ahorro por descuentos y el total estimado por separado.
+- Cada línea muestra subtotal por producto, precio unitario, controles accesibles de cantidad y disponibilidad cuando hay inventario controlado.
+- El resumen indica el número total de unidades; la validación definitiva del inventario sigue realizándose al registrar el pedido.
