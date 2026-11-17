@@ -398,3 +398,30 @@ main#inicio{scroll-margin-top:82px}
 .product-spec-list li{display:flex;align-items:baseline;gap:12px}
 .product-spec-list li>span{flex:0 0 22px;color:var(--accent);font-size:9px;font-weight:800;letter-spacing:1px}
 @media(max-width:650px){.product-detail-video{max-height:220px}}
+
+
+/* Carrito: jerarquía de precios y controles táctiles */
+.cart-drawer{overscroll-behavior:contain}
+.cart-item>img{flex:0 0 76px;border:1px solid var(--line);background:var(--bg)}
+.cart-item-info{flex:1}
+.cart-item-info>strong{line-height:1.35}
+.cart-line-prices{flex-wrap:wrap}
+.cart-line-prices span{font-weight:700;color:var(--text)}
+.cart-line-end{min-width:66px}
+.cart-line-end .remove{padding:7px 0;letter-spacing:1px}
+.qty{gap:10px}
+.qty button{width:30px;height:30px;border-radius:0;transition:background .18s,border-color .18s}
+.qty button:not(:disabled):hover{background:var(--accent);border-color:var(--accent);color:#111}
+.qty button:focus-visible,.remove:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.cart-total .cart-saving{font-variant-numeric:tabular-nums}
+.cart-total .grand-total strong{font-size:19px;font-variant-numeric:tabular-nums}
+.cart-total .btn-primary{min-height:50px}
+@media(max-width:520px){
+ .cart-drawer{padding:18px 16px}
+ .cart-item>img{flex-basis:60px;width:60px;height:72px}
+ .cart-line-end{min-width:58px}
+ .qty{gap:7px}
+ .qty button{width:28px;height:28px}
+ .cart-total .grand-total strong{font-size:17px}
+}
+@media(prefers-reduced-motion:reduce){.qty button{transition:none}}
