@@ -84,3 +84,9 @@ En `/admin`, cada producto con control de inventario permite configurar un punto
 - La migración SQL crea `order_status_history` con acceso de lectura exclusivo para administradores.
 - Un trigger registra automáticamente la creación del pedido y cada cambio real de estado, con fecha y usuario autenticado cuando está disponible.
 - La ficha del pedido consulta y muestra la línea de tiempo; los pedidos anteriores a la instalación de esta migración no tendrán eventos históricos retroactivos.
+
+
+### Ficha y galería de productos
+- La ficha permite recorrer las imágenes mediante miniaturas seleccionables y muestra el contador de la galería.
+- Presenta descuento y disponibilidad/inventario cuando el producto tiene control de stock.
+- Las tarjetas del catálogo cargan imágenes de forma diferida y muestran una etiqueta de agotado cuando corresponde.
