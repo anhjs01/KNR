@@ -22,7 +22,7 @@ VITE_SUPABASE_URL=https://TU-PROYECTO.supabase.co
 VITE_SUPABASE_ANON_KEY=TU_CLAVE_PUBLICA
 ```
 
-4. Abre **SQL Editor** en Supabase y ejecuta el contenido completo de `supabase/schema.sql`. Si ya habías configurado Supabase antes de esta actualización, vuelve a ejecutar el archivo completo: añade columnas multimedia e inventario, la biblioteca `music_tracks`, la tabla privada `orders`, sus políticas RLS y la función transaccional `place_order`. La función también valida y calcula en servidor los descuentos de combos; vuelve a ejecutar el archivo para aplicar esta corrección.
+4. Abre **SQL Editor** en Supabase y ejecuta el contenido completo de `supabase/schema.sql`. Si ya habías configurado Supabase antes de esta actualización, vuelve a ejecutar el archivo completo: añade columnas multimedia, inventario y costo de compra, la biblioteca `music_tracks`, la tabla privada `orders`, sus políticas RLS y la función transaccional `place_order`. La función también valida y calcula en servidor los descuentos de combos; vuelve a ejecutar el archivo para aplicar esta corrección.
 5. En **Authentication → Users**, crea el usuario administrador con correo y contraseña.
 6. Copia su UUID y autorízalo ejecutando en SQL Editor:
 
@@ -41,12 +41,12 @@ La clave usada en el frontend debe ser la clave pública de Supabase. Nunca colo
 - Catálogo conectado a Supabase cuando se configura el backend; los productos de muestra sirven como vista previa mientras no haya catálogo.
 - Filtros y búsqueda, ficha de producto y galería de imágenes.
 - Carrito guardado en el navegador y límites de unidades disponibles cuando el producto tiene inventario controlado.
-- Inventario por producto: activa el control de stock desde el administrador, define las unidades y la tienda bloquea la compra cuando no quedan existencias.
+- Inventario por producto: activa el control de stock desde el administrador, define las unidades y la tienda bloquea la compra cuando no quedan existencias. Registra también el costo de compra por unidad para calcular la utilidad bruta.
 - Pedidos persistidos en Supabase mediante `place_order`: el servidor vuelve a comprobar disponibilidad, calcula el total con precios vigentes, valida el combo (mínimo dos artículos y al menos un reloj), aplica el descuento correspondiente solo a sus artículos y descuenta el inventario de forma transaccional. El pedido conserva el precio de lista y el precio aplicado por unidad.
 - Panel privado de pedidos con datos de entrega, detalle de artículos, total y estados: pendiente, confirmado, preparando, enviado, entregado o cancelado.
 - Resumen administrativo de pedidos, pendientes, ventas entregadas y alertas de inventario bajo (5 unidades o menos), con acceso directo para ajustar el stock.
 - Historial de pedidos paginado (50 por página), con filtros por estado y fechas, contador total y exportación CSV de todo el conjunto filtrado (descarga por bloques para superar el límite de una sola consulta).
-- Reportes históricos mediante `admin_order_report`: pedidos totales, pendientes, ventas entregadas, top 5 productos y evolución mensual de los últimos 12 meses calculados en PostgreSQL sobre todos los pedidos coincidentes con los filtros, sin depender de la página visible. La gráfica compara ventas entregadas del mes actual frente al anterior. Ejecuta `supabase/schema.sql` completo en Supabase SQL Editor para instalar o actualizar esta función.
+- Reportes históricos mediante `admin_order_report`: pedidos totales, pendientes, ventas entregadas, costo de productos, utilidad y margen bruto, top 5 productos por utilidad y evolución mensual de los últimos 12 meses calculados en PostgreSQL sobre todos los pedidos coincidentes con los filtros, sin depender de la página visible. Los pedidos históricos anteriores al registro de costos se calculan con costo cero hasta que se actualicen sus snapshots; la rentabilidad histórica anterior no puede reconstruirse automáticamente. La gráfica compara ventas entregadas del mes actual frente al anterior. Ejecuta `supabase/schema.sql` completo en Supabase SQL Editor para instalar o actualizar esta función.
 - Constructor de combos: reloj obligatorio y accesorios opcionales. Descuento adicional automático por cantidad (2 productos: 5%, 3: 10%, 4 o más: 15%), aplicado al precio vigente de cada artículo.
 - Formulario de entrega: nombre, teléfono, barrio, dirección, detalles de apartamento/conjunto/piso y persona que recibe.
 - Resumen del pedido preparado para WhatsApp. El cliente revisa y envía el mensaje desde su propia cuenta.
