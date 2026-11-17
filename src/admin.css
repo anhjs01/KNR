@@ -46,3 +46,19 @@
 .admin-order-pagination button:last-child{border-color:#a88a5b;color:#e1c18d}
 .admin-order-pagination button:focus-visible,.admin-order-filter-actions button:focus-visible{outline:2px solid #d9b77b;outline-offset:2px}
 @media(max-width:620px){.admin-order-filter-actions{grid-column:1/-1}.admin-order-filter-actions button{flex:1}.admin-order-pagination{align-items:flex-start;flex-direction:column}.admin-order-pagination>div{width:100%}.admin-order-pagination button{flex:1}}
+
+
+.admin-sales-trend{background:#171717;border:1px solid #303030;padding:18px;margin:0 0 24px}
+.admin-sales-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0 20px}
+.admin-sales-summary>div{display:flex;flex-direction:column;gap:7px;padding:13px;background:#202020;min-width:0}
+.admin-sales-summary span{font-size:9px;letter-spacing:1px;color:#aaa}
+.admin-sales-summary strong{font-size:clamp(16px,2vw,23px);color:#f1f1f1;overflow-wrap:anywhere}
+.admin-sales-summary .trend-positive{color:#8bc49a}.admin-sales-summary .trend-negative{color:#e39a8e}
+.monthly-sales-chart{display:flex;flex-direction:column;gap:11px}
+.monthly-sales-row{display:grid;grid-template-columns:62px minmax(60px,1fr) minmax(100px,auto) 76px;align-items:center;gap:12px}
+.monthly-sales-label{font-size:10px;color:#aaa}
+.monthly-sales-track{height:12px;background:#292929;overflow:hidden}
+.monthly-sales-bar{height:100%;min-width:0;background:linear-gradient(90deg,#80633c,#d4b27b)}
+.monthly-sales-row strong{font-size:11px;color:#eee;text-align:right;white-space:nowrap}
+.monthly-sales-row small{font-size:10px;color:#999;text-align:right;white-space:nowrap}
+@media(max-width:620px){.admin-sales-summary{grid-template-columns:1fr}.monthly-sales-row{grid-template-columns:48px minmax(30px,1fr) auto;gap:7px}.monthly-sales-row small{grid-column:3;text-align:right}.monthly-sales-row strong{grid-column:3;grid-row:1}}
