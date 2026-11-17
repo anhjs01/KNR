@@ -71,3 +71,9 @@ La clave usada en el frontend debe ser la clave pública de Supabase. Nunca colo
 En `/admin`, cada producto con control de inventario permite configurar un punto de reposición y una cantidad sugerida. El panel calcula unidades vendidas en pedidos entregados durante los últimos 30 días, promedio diario y días estimados hasta agotar existencias. Marca para revisión los productos bajo su punto de reposición o con agotamiento estimado en 14 días o menos. La recomendación es orientativa y se recalcula al actualizar los reportes; no genera compras ni modifica el stock automáticamente. Ejecuta de nuevo `supabase/schema.sql` completo para añadir las columnas y actualizar `admin_order_report`.
 
 
+
+
+### Historial de estados de pedidos
+- La migración SQL crea `order_status_history` con acceso de lectura exclusivo para administradores.
+- Un trigger registra automáticamente la creación del pedido y cada cambio real de estado, con fecha y usuario autenticado cuando está disponible.
+- La ficha del pedido consulta y muestra la línea de tiempo; los pedidos anteriores a la instalación de esta migración no tendrán eventos históricos retroactivos.
