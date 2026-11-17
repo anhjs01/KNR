@@ -71,3 +71,16 @@
 .top-product-list>div strong{font-size:11px}
 @media(max-width:900px){.admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:440px){.admin-stats{grid-template-columns:1fr}}
+
+
+.expense-manager{margin-top:22px}
+.expense-form{display:grid;gap:14px;padding:18px;border:1px solid var(--admin-line,#343434);border-radius:14px;margin:16px 0}
+.expense-form .admin-fields{margin:0}
+.expense-list{display:grid;gap:8px}
+.expense-item{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:16px;padding:13px 15px;border:1px solid var(--admin-line,#343434);border-radius:12px}
+.expense-item>div{display:grid;gap:4px;min-width:0}
+.expense-item b{font-size:13px}
+.expense-item span{font-size:11px;color:var(--admin-muted,#999)}
+.expense-item strong{font-size:13px;white-space:nowrap}
+.expense-item button{padding:7px 10px}
+@media(max-width:620px){.expense-item{grid-template-columns:minmax(0,1fr) auto;gap:9px}.expense-item button{grid-column:1/-1;justify-self:start}.expense-form{padding:13px}}
