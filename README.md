@@ -22,7 +22,7 @@ VITE_SUPABASE_URL=https://TU-PROYECTO.supabase.co
 VITE_SUPABASE_ANON_KEY=TU_CLAVE_PUBLICA
 ```
 
-4. Abre **SQL Editor** en Supabase y ejecuta el contenido completo de `supabase/schema.sql`. Si ya habías configurado Supabase antes de esta actualización, vuelve a ejecutar el archivo completo: añade columnas multimedia e inventario, la biblioteca `music_tracks`, la tabla privada `orders`, sus políticas RLS y la función transaccional `place_order`.
+4. Abre **SQL Editor** en Supabase y ejecuta el contenido completo de `supabase/schema.sql`. Si ya habías configurado Supabase antes de esta actualización, vuelve a ejecutar el archivo completo: añade columnas multimedia e inventario, la biblioteca `music_tracks`, la tabla privada `orders`, sus políticas RLS y la función transaccional `place_order`. La función también valida y calcula en servidor los descuentos de combos; vuelve a ejecutar el archivo para aplicar esta corrección.
 5. En **Authentication → Users**, crea el usuario administrador con correo y contraseña.
 6. Copia su UUID y autorízalo ejecutando en SQL Editor:
 
@@ -42,7 +42,7 @@ La clave usada en el frontend debe ser la clave pública de Supabase. Nunca colo
 - Filtros y búsqueda, ficha de producto y galería de imágenes.
 - Carrito guardado en el navegador y límites de unidades disponibles cuando el producto tiene inventario controlado.
 - Inventario por producto: activa el control de stock desde el administrador, define las unidades y la tienda bloquea la compra cuando no quedan existencias.
-- Pedidos persistidos en Supabase mediante `place_order`: el servidor vuelve a comprobar disponibilidad, calcula el total con precios vigentes y descuenta el inventario de forma transaccional.
+- Pedidos persistidos en Supabase mediante `place_order`: el servidor vuelve a comprobar disponibilidad, calcula el total con precios vigentes, valida el combo (mínimo dos artículos y al menos un reloj), aplica el descuento correspondiente solo a sus artículos y descuenta el inventario de forma transaccional. El pedido conserva el precio de lista y el precio aplicado por unidad.
 - Panel privado de pedidos con datos de entrega, detalle de artículos, total y estados: pendiente, confirmado, preparando, enviado, entregado o cancelado.
 - Constructor de combos: reloj obligatorio y accesorios opcionales. Descuento adicional automático por cantidad (2 productos: 5%, 3: 10%, 4 o más: 15%), aplicado al precio vigente de cada artículo.
 - Formulario de entrega: nombre, teléfono, barrio, dirección, detalles de apartamento/conjunto/piso y persona que recibe.
