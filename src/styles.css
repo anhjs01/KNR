@@ -22,3 +22,36 @@
 
 /* Revisión previa al envío del pedido */
 .checkout-order-review{margin:20px 0;padding:15px;background:var(--bg);border:1px solid var(--line)}.checkout-review-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:11px;border-bottom:1px solid var(--line);font-size:10px;letter-spacing:1.2px}.checkout-review-head span{color:var(--muted);font-size:9px}.checkout-review-line{display:grid;grid-template-columns:46px minmax(0,1fr) auto;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)}.checkout-review-line img{width:46px;height:50px;object-fit:cover;background:var(--panel)}.checkout-review-line>div{display:flex;min-width:0;flex-direction:column;gap:5px}.checkout-review-line>div strong{font-size:11px;overflow-wrap:anywhere}.checkout-review-line small{font-size:10px;color:var(--muted)}.checkout-review-line>b{font-size:11px;white-space:nowrap}.checkout-review-saving{display:flex;justify-content:space-between;gap:10px;padding-top:11px;font-size:10px;color:var(--muted)}.checkout-review-saving strong{color:#79b98d}.checkout-total small{font-size:10px;font-weight:400;color:var(--muted)}.checkout-fields input:invalid:not(:placeholder-shown){border-color:#bd766e}.checkout-modal button[type=submit]{margin-top:16px}
+
+
+/* Dirección visual KNR · refinamiento editorial */
+.header{position:sticky;top:0;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.logo{transition:letter-spacing .25s,color .25s}.logo:hover{letter-spacing:-1.5px;color:var(--accent)}
+.nav-link,.filter,.filter-button,.quick-add,.bag-btn,.btn-text{transition:color .2s,border-color .2s,background .2s,transform .2s}
+.nav-link:hover,.filter:hover,.btn-text:hover{color:var(--accent)}
+.bag-btn{position:relative;padding:9px 0}.bag-btn svg{transition:transform .2s}.bag-btn:hover svg{transform:translateY(-2px)}
+.hero{isolation:isolate}.hero:before{content:'KNR / TIME IS YOURS';position:absolute;z-index:-1;left:2.2%;top:50%;writing-mode:vertical-rl;transform:rotate(180deg);font-size:8px;letter-spacing:3px;color:var(--muted);opacity:.55}
+.hero-copy{position:relative}.hero-copy:after{content:'';position:absolute;left:0;bottom:0;width:76px;height:1px;background:var(--accent);opacity:.65}
+.hero-visual{box-shadow:0 24px 70px #0002}.hero-visual:after{content:'';position:absolute;inset:14px;border:1px solid #ffffff30;pointer-events:none}
+.hero-image{transition:transform 1s cubic-bezier(.2,.7,.2,1),filter .5s}.hero-visual:hover .hero-image{transform:scale(1.025)}
+.hero-stamp{backdrop-filter:blur(5px);background:#1112}
+.ticker{background:linear-gradient(90deg,transparent, color-mix(in srgb,var(--panel) 75%,transparent),transparent)}
+.collection{position:relative}.collection:before{content:'01';position:absolute;right:9%;top:58px;color:var(--accent);font:700 11px Manrope;letter-spacing:2px;opacity:.8}
+.section-top{gap:25px}.section-top>div{max-width:650px}.section-top h2{letter-spacing:-.075em}
+.filters{gap:0}.filter{padding:0 18px 14px;border-bottom:1px solid transparent}.filter:first-child{padding-left:0}.filter.active{border-bottom-color:var(--accent)}
+.product-grid{column-gap:22px;row-gap:42px}
+.product-card{position:relative}.product-image{background:var(--panel);isolation:isolate}.product-image:after{content:'';position:absolute;inset:45% 0 0;background:linear-gradient(0deg,#0008,transparent);pointer-events:none;opacity:.5;transition:opacity .25s}.product-image:hover:after{opacity:.85}
+.product-image img{transition:transform .8s cubic-bezier(.2,.7,.2,1),filter .4s;filter:saturate(.68) contrast(1.02)}.product-image:hover img{transform:scale(1.055);filter:saturate(.95) contrast(1.03)}
+.product-tag{z-index:1;bottom:14px;left:14px;letter-spacing:1.3px}.discount,.sold-out-tag{z-index:1}
+.quick-view{z-index:2}.product-meta{align-items:flex-start}.product-meta h3{letter-spacing:-.3px}.quick-add{flex:none;border-radius:50%;width:36px;height:36px}.quick-add:hover:not(:disabled){background:var(--accent);border-color:var(--accent);color:#111;transform:rotate(90deg)}
+.price-row strong{letter-spacing:.2px}.stock-note{display:flex;align-items:center;gap:7px}.stock-note:before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+.combo-banner{position:relative}.combo-image{position:relative;overflow:hidden}.combo-image:after{content:'KNR / OBJECTS OF STYLE';position:absolute;left:20px;bottom:18px;color:#fff;font-size:8px;letter-spacing:2px}.combo-copy{position:relative}.combo-copy:before{content:'02';position:absolute;right:28px;top:26px;color:var(--accent);font:700 10px Manrope;letter-spacing:2px}
+.values{padding-top:70px;padding-bottom:85px}.values>div{position:relative;padding-top:12px}.values>div:before{content:'';position:absolute;left:-1px;top:0;width:30px;height:1px;background:var(--accent)}.values svg{width:23px;height:23px;stroke-width:1.35}
+footer{gap:20px}footer .logo{margin-right:auto}
+.product-modal,.combo-modal,.checkout-modal,.cart-drawer{box-shadow:0 30px 100px #0006}
+.close{transition:transform .2s,border-color .2s}.close:hover{transform:rotate(90deg);border-color:var(--accent)}
+.btn-primary{box-shadow:0 8px 24px color-mix(in srgb,var(--accent) 16%,transparent)}.btn-primary:active,.btn-outline:active{transform:translateY(1px)}
+@media(min-width:1200px){.product-grid{column-gap:28px}.product-image{aspect-ratio:.82}.section{padding-left:10%;padding-right:10%}}
+@media(max-width:900px){.hero:before,.collection:before{display:none}.product-grid{column-gap:16px;row-gap:32px}}
+@media(max-width:650px){.header{box-shadow:0 8px 22px #00008}.hero-visual{box-shadow:0 15px 35px #0003}.hero-visual:after{inset:9px}.product-image:after{opacity:.65}.quick-view{opacity:1;transform:none;padding:10px;font-size:7px}.product-grid{column-gap:11px;row-gap:29px}.product-meta{margin-top:11px}.quick-add{width:30px;height:30px}.values{padding-top:55px;padding-bottom:65px}footer .logo{width:100%}}
+@media(prefers-reduced-motion:reduce){.hero-image,.product-image img,.quick-add,.close{transition:none!important}}
