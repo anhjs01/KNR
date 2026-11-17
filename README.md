@@ -69,3 +69,8 @@ La clave usada en el frontend debe ser la clave pública de Supabase. Nunca colo
 ### Previsión y reposición de inventario
 
 En `/admin`, cada producto con control de inventario permite configurar un punto de reposición y una cantidad sugerida. El panel calcula unidades vendidas en pedidos entregados durante los últimos 30 días, promedio diario y días estimados hasta agotar existencias. Marca para revisión los productos bajo su punto de reposición o con agotamiento estimado en 14 días o menos. La recomendación es orientativa y se recalcula al actualizar los reportes; no genera compras ni modifica el stock automáticamente. Ejecuta de nuevo `supabase/schema.sql` completo para añadir las columnas y actualizar `admin_order_report`.
+
+
+### Proveedores y órdenes de compra
+
+El panel `/admin` permite registrar proveedores, crear órdenes con varios productos, cantidades y costos unitarios, consultar las últimas 100 órdenes y confirmar su recepción. La recepción se procesa en una función transaccional protegida: suma las unidades al stock de productos con inventario controlado, actualiza el costo privado de compra y marca la orden como recibida para impedir duplicar la entrada. Ejecuta de nuevo `supabase/schema.sql` completo para crear las tablas, políticas y funciones.
