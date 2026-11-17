@@ -156,3 +156,86 @@ with check (exists (select 1 from public.admin_users where user_id=auth.uid()));
 drop policy if exists "KNR admins can delete tracks" on public.music_tracks;
 create policy "KNR admins can delete tracks" on public.music_tracks for delete to authenticated
 using (exists (select 1 from public.admin_users where user_id=auth.uid()));
+
+-- Inventario y pedidos con creación transaccional desde la tienda.
+alter table public.products add column if not exists stock integer not null default 0 check (stock >= 0);
+alter table public.products add column if not exists track_inventory boolean not null default false;
+
+create table if not exists public.orders (
+  id uuid primary key default gen_random_uuid(),
+  status text not null default 'pending' check (status in ('pending','confirmed','preparing','shipped','delivered','cancelled')),
+  customer_name text not null,
+  customer_phone text not null,
+  neighborhood text not null,
+  delivery_address text not null,
+  delivery_details text not null default '',
+  receiver text not null default '',
+  items jsonb not null default '[]'::jsonb,
+  total integer not null check (total >= 0),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+alter table public.orders enable row level security;
+drop policy if exists "KNR admins can read orders" on public.orders;
+create policy "KNR admins can read orders" on public.orders for select to authenticated
+using (exists (select 1 from public.admin_users where user_id=auth.uid()));
+drop policy if exists "KNR admins can update orders" on public.orders;
+create policy "KNR admins can update orders" on public.orders for update to authenticated
+using (exists (select 1 from public.admin_users where user_id=auth.uid()))
+with check (exists (select 1 from public.admin_users where user_id=auth.uid()));
+drop trigger if exists orders_updated_at on public.orders;
+create trigger orders_updated_at before update on public.orders
+for each row execute function public.set_updated_at();
+
+create or replace function public.place_order(p_customer jsonb, p_items jsonb)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_item jsonb;
+  v_product public.products%rowtype;
+  v_qty integer;
+  v_total integer := 0;
+  v_order_id uuid;
+  v_snapshot jsonb := '[]'::jsonb;
+begin
+  if coalesce(trim(p_customer->>'name'),'') = ''
+    or coalesce(trim(p_customer->>'phone'),'') = ''
+    or coalesce(trim(p_customer->>'neighborhood'),'') = ''
+    or coalesce(trim(p_customer->>'address'),'') = '' then
+    raise exception 'Completa los datos obligatorios de entrega.';
+  end if;
+  if jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) = 0 then
+    raise exception 'El carrito está vacío.';
+  end if;
+  for v_item in select value from jsonb_array_elements(p_items)
+  loop
+    v_qty := (v_item->>'qty')::integer;
+    if v_qty < 1 or v_qty > 20 then raise exception 'Cantidad de producto no válida.'; end if;
+    select * into v_product from public.products
+      where id = (v_item->>'id')::uuid and active = true for update;
+    if not found then raise exception 'Uno de los productos ya no está disponible.'; end if;
+    if v_product.track_inventory and v_product.stock < v_qty then
+      raise exception 'Stock insuficiente para: %', v_product.name;
+    end if;
+    v_total := v_total + (v_product.price * v_qty);
+    v_snapshot := v_snapshot || jsonb_build_array(jsonb_build_object(
+      'id',v_product.id,'name',v_product.name,'qty',v_qty,'unit_price',v_product.price,
+      'category',v_product.category,'style',v_product.style
+    ));
+    if v_product.track_inventory then
+      update public.products set stock = stock - v_qty where id = v_product.id;
+    end if;
+  end loop;
+  insert into public.orders(customer_name,customer_phone,neighborhood,delivery_address,delivery_details,receiver,items,total)
+  values(trim(p_customer->>'name'),trim(p_customer->>'phone'),trim(p_customer->>'neighborhood'),
+    trim(p_customer->>'address'),coalesce(p_customer->>'details',''),
+    coalesce(nullif(trim(p_customer->>'receiver'),''),trim(p_customer->>'name')),v_snapshot,v_total)
+  returning id into v_order_id;
+  return v_order_id;
+end;
+$$;
+revoke all on function public.place_order(jsonb,jsonb) from public;
+grant execute on function public.place_order(jsonb,jsonb) to anon, authenticated;
