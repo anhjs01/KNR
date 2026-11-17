@@ -1,6 +1,6 @@
 import React,{useEffect,useState} from 'react';
 import {createClient} from '@supabase/supabase-js';
-import {ArrowLeft,LogIn,LogOut,PackagePlus,Trash2,Upload,Save,RefreshCw,Image as ImageIcon} from 'lucide-react';
+import {ArrowLeft,LogIn,LogOut,PackagePlus,Trash2,Upload,Save,RefreshCw,Image as ImageIcon,Headphones} from 'lucide-react';
 import './admin.css';
 
 const url=import.meta.env.VITE_SUPABASE_URL;
