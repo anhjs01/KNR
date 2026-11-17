@@ -83,7 +83,10 @@ export default function Admin(){
  async function toggle(p){const {error}=await supabase.from('products').update({active:!p.active}).eq('id',p.id);if(error)setError(error.message);else load()}
  const lowStockItems=items.filter(p=>p.track_inventory&&Number(p.stock||0)<=5);
  const filteredOrders=orders;
- const deliveredRevenue=Number(orderReport?.delivered_revenue||0);\n const deliveredCost=Number(orderReport?.delivered_cost||0);\n const deliveredProfit=Number(orderReport?.delivered_profit||0);\n const profitMargin=deliveredRevenue>0?deliveredProfit/deliveredRevenue*100:0;
+ const deliveredRevenue=Number(orderReport?.delivered_revenue||0);
+ const deliveredCost=Number(orderReport?.delivered_cost||0);
+ const deliveredProfit=Number(orderReport?.delivered_profit||0);
+ const profitMargin=deliveredRevenue>0?deliveredProfit/deliveredRevenue*100:0;
  const pendingCount=Number(orderReport?.pending_count||0);
  const topProducts=orderReport?.top_products||[];
  const monthlySales=orderReport?.monthly_sales||[];
