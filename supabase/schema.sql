@@ -382,6 +382,24 @@ begin
     'total_orders',(select count(*) from filtered),
     'pending_count',(select count(*) from filtered where status='pending'),
     'delivered_revenue',(select coalesce(sum(total),0) from filtered where status='delivered'),\n    'delivered_cost',(select coalesce(sum((item.value->>'qty')::numeric*coalesce((item.value->>'unit_cost')::numeric,0)),0) from filtered f cross join lateral jsonb_array_elements(f.items) item(value) where f.status='delivered'),\n    'delivered_profit',(select coalesce(sum((item.value->>'qty')::numeric*((item.value->>'unit_price')::numeric-coalesce((item.value->>'unit_cost')::numeric,0))),0) from filtered f cross join lateral jsonb_array_elements(f.items) item(value) where f.status='delivered'),
+    'operating_expenses',(select coalesce(sum(e.amount),0) from public.operating_expenses e
+      where (p_from is null or e.incurred_on >= p_from::date)
+        and (p_to is null or e.incurred_on <= p_to::date)),
+    'net_profit',
+      (select coalesce(sum((item.value->>'qty')::numeric*((item.value->>'unit_price')::numeric-coalesce((item.value->>'unit_cost')::numeric,0))),0)
+       from filtered f cross join lateral jsonb_array_elements(f.items) item(value) where f.status='delivered')
+      - (select coalesce(sum(e.amount),0) from public.operating_expenses e
+         where (p_from is null or e.incurred_on >= p_from::date)
+           and (p_to is null or e.incurred_on <= p_to::date)),
+    'net_margin_pct',
+      case when (select coalesce(sum(total),0) from filtered where status='delivered') > 0 then
+        (((select coalesce(sum((item.value->>'qty')::numeric*((item.value->>'unit_price')::numeric-coalesce((item.value->>'unit_cost')::numeric,0))),0)
+           from filtered f cross join lateral jsonb_array_elements(f.items) item(value) where f.status='delivered')
+          - (select coalesce(sum(e.amount),0) from public.operating_expenses e
+             where (p_from is null or e.incurred_on >= p_from::date)
+               and (p_to is null or e.incurred_on <= p_to::date)))
+         / (select coalesce(sum(total),0) from filtered where status='delivered')) * 100
+      else 0 end,
     'top_products',coalesce((select jsonb_agg(jsonb_build_object(
       'id',product_id,'name',product_name,'qty',qty,'revenue',revenue,'cost',cost,'profit',profit
     ) order by qty desc,revenue desc) from ranking),'[]'::jsonb),
@@ -401,3 +419,21 @@ end;
 $$;
 revoke all on function public.admin_order_report(text,timestamptz,timestamptz) from public;
 grant execute on function public.admin_order_report(text,timestamptz,timestamptz) to authenticated;
+
+
+-- Gastos operativos registrados por el equipo administrativo.
+create table if not exists public.operating_expenses (
+  id uuid primary key default gen_random_uuid(),
+  category text not null check (category in ('Envio','Empaque','Publicidad','Comisiones','Operación','Otro')),
+  description text not null,
+  amount integer not null check (amount > 0),
+  incurred_on date not null default current_date,
+  created_at timestamptz not null default now()
+);
+alter table public.operating_expenses enable row level security;
+grant select, insert, update, delete on public.operating_expenses to authenticated;
+drop policy if exists "KNR admins manage operating expenses" on public.operating_expenses;
+create policy "KNR admins manage operating expenses" on public.operating_expenses
+for all to authenticated
+using (exists (select 1 from public.admin_users where user_id=auth.uid()))
+with check (exists (select 1 from public.admin_users where user_id=auth.uid()));
