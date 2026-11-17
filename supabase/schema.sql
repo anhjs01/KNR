@@ -160,14 +160,25 @@ using (exists (select 1 from public.admin_users where user_id=auth.uid()));
 -- Inventario y pedidos con creación transaccional desde la tienda.
 alter table public.products add column if not exists stock integer not null default 0 check (stock >= 0);
 alter table public.products add column if not exists track_inventory boolean not null default false;
-alter table public.products drop column if exists cost_price;
-
 -- Costos de compra aislados de la tabla pública de productos.
 create table if not exists public.product_costs (
   product_id uuid primary key references public.products(id) on delete cascade,
   cost_price integer not null default 0 check (cost_price >= 0),
   updated_at timestamptz not null default now()
 );
+-- Conserva los costos que pudieran haberse guardado en una versión anterior.
+do $
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='products' and column_name='cost_price'
+  ) then
+    execute 'insert into public.product_costs(product_id,cost_price)
+      select id,cost_price from public.products
+      on conflict(product_id) do update set cost_price=excluded.cost_price';
+    alter table public.products drop column cost_price;
+  end if;
+end $;
 alter table public.product_costs enable row level security;
 grant select, insert, update, delete on public.product_costs to authenticated;
 drop policy if exists "KNR admins manage product costs" on public.product_costs;
@@ -439,7 +450,7 @@ begin
       else 0 end,
     'top_products',coalesce((select jsonb_agg(jsonb_build_object(
       'id',product_id,'name',product_name,'qty',qty,'revenue',revenue,'cost',cost,'profit',profit
-    ) order by qty desc,revenue desc) from ranking),'[]'::jsonb),
+    ) order by profit desc,revenue desc) from ranking),'[]'::jsonb),
     'monthly_sales',coalesce((
       select jsonb_agg(jsonb_build_object(
         'month',to_char(m.month_start,'YYYY-MM'),
