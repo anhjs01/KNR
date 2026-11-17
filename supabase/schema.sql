@@ -313,6 +313,8 @@ for each row execute function public.restore_cancelled_order_stock();
 
 -- Reporte histórico agregado: no depende de la página visible en el panel.
 -- Solo administradores pueden consultar los datos comerciales y de pedidos.
+-- Reporte histórico agregado: métricas, ranking y evolución mensual.
+-- Solo administradores pueden consultar datos comerciales y de pedidos.
 create or replace function public.admin_order_report(
   p_status text default null,
   p_from timestamptz default null,
@@ -355,6 +357,21 @@ begin
     group by product_id, product_name
     order by sum(qty) desc, sum(qty * unit_price) desc
     limit 5
+  ),
+  months as (
+    select generate_series(
+      date_trunc('month',current_date)-interval '11 months',
+      date_trunc('month',current_date),
+      interval '1 month'
+    )::date as month_start
+  ),
+  monthly as (
+    select
+      date_trunc('month',f.created_at)::date as month_start,
+      count(*)::integer as order_count,
+      coalesce(sum(f.total) filter (where f.status='delivered'),0)::numeric as delivered_revenue
+    from filtered f
+    group by date_trunc('month',f.created_at)::date
   )
   select jsonb_build_object(
     'total_orders',(select count(*) from filtered),
@@ -362,7 +379,16 @@ begin
     'delivered_revenue',(select coalesce(sum(total),0) from filtered where status='delivered'),
     'top_products',coalesce((select jsonb_agg(jsonb_build_object(
       'id',product_id,'name',product_name,'qty',qty,'revenue',revenue
-    ) order by qty desc,revenue desc) from ranking),'[]'::jsonb)
+    ) order by qty desc,revenue desc) from ranking),'[]'::jsonb),
+    'monthly_sales',coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'month',to_char(m.month_start,'YYYY-MM'),
+        'label',to_char(m.month_start,'Mon YY'),
+        'orders',coalesce(x.order_count,0),
+        'delivered_revenue',coalesce(x.delivered_revenue,0)
+      ) order by m.month_start)
+      from months m left join monthly x on x.month_start=m.month_start
+    ),'[]'::jsonb)
   ) into v_report;
 
   return v_report;
