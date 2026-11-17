@@ -309,3 +309,64 @@ $$;
 drop trigger if exists orders_restore_stock_on_cancel on public.orders;
 create trigger orders_restore_stock_on_cancel before update of status on public.orders
 for each row execute function public.restore_cancelled_order_stock();
+
+
+-- Reporte histórico agregado: no depende de la página visible en el panel.
+-- Solo administradores pueden consultar los datos comerciales y de pedidos.
+create or replace function public.admin_order_report(
+  p_status text default null,
+  p_from timestamptz default null,
+  p_to timestamptz default null
+)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+declare
+  v_report jsonb;
+begin
+  if not exists (select 1 from public.admin_users where user_id = auth.uid()) then
+    raise exception 'No autorizado para consultar reportes.';
+  end if;
+
+  with filtered as (
+    select o.* from public.orders o
+    where (p_status is null or o.status = p_status)
+      and (p_from is null or o.created_at >= p_from)
+      and (p_to is null or o.created_at <= p_to)
+  ),
+  product_lines as (
+    select
+      coalesce(line->>'id', line->>'name') as product_id,
+      coalesce(line->>'name','Producto') as product_name,
+      coalesce((line->>'qty')::integer,0) as qty,
+      coalesce((line->>'unit_price')::numeric,0) as unit_price
+    from filtered f
+    cross join lateral jsonb_array_elements(f.items) line
+    where f.status <> 'cancelled'
+  ),
+  ranking as (
+    select product_id, product_name,
+      sum(qty)::integer as qty,
+      sum(qty * unit_price)::numeric as revenue
+    from product_lines
+    group by product_id, product_name
+    order by sum(qty) desc, sum(qty * unit_price) desc
+    limit 5
+  )
+  select jsonb_build_object(
+    'total_orders',(select count(*) from filtered),
+    'pending_count',(select count(*) from filtered where status='pending'),
+    'delivered_revenue',(select coalesce(sum(total),0) from filtered where status='delivered'),
+    'top_products',coalesce((select jsonb_agg(jsonb_build_object(
+      'id',product_id,'name',product_name,'qty',qty,'revenue',revenue
+    ) order by qty desc,revenue desc) from ranking),'[]'::jsonb)
+  ) into v_report;
+
+  return v_report;
+end;
+$$;
+revoke all on function public.admin_order_report(text,timestamptz,timestamptz) from public;
+grant execute on function public.admin_order_report(text,timestamptz,timestamptz) to authenticated;
