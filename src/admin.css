@@ -35,3 +35,14 @@
 .top-product-list strong{font-size:12px;color:#eee;white-space:nowrap}
 @media(max-width:760px){.admin-order-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-order-filters button{width:100%}}
 @media(max-width:440px){.admin-order-filters{grid-template-columns:1fr}.top-product-list>div{grid-template-columns:26px minmax(0,1fr) auto}.top-product-list strong{grid-column:2 / 4}}
+
+
+.admin-order-filter-actions{display:flex;gap:8px;align-items:center}
+.admin-order-pagination{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 0;border-top:1px solid #333;margin-top:12px}
+.admin-order-pagination>span{font-size:11px;color:#aaa}
+.admin-order-pagination>div{display:flex;gap:8px;flex-wrap:wrap}
+.admin-order-pagination button{background:#222;border:1px solid #555;color:#eee;padding:9px 12px;font-size:11px;cursor:pointer}
+.admin-order-pagination button:disabled{opacity:.35;cursor:not-allowed}
+.admin-order-pagination button:last-child{border-color:#a88a5b;color:#e1c18d}
+.admin-order-pagination button:focus-visible,.admin-order-filter-actions button:focus-visible{outline:2px solid #d9b77b;outline-offset:2px}
+@media(max-width:620px){.admin-order-filter-actions{grid-column:1/-1}.admin-order-filter-actions button{flex:1}.admin-order-pagination{align-items:flex-start;flex-direction:column}.admin-order-pagination>div{width:100%}.admin-order-pagination button{flex:1}}
