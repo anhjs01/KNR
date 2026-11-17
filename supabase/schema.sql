@@ -86,3 +86,41 @@ for each row execute function public.set_updated_at();
 -- Después de crear el usuario desde Authentication > Users, autorízalo:
 -- insert into public.admin_users(user_id)
 -- select id from auth.users where email = 'TU_CORREO_ADMIN';
+
+
+-- Banners promocionales editables desde el panel KNR.
+create table if not exists public.store_banners (
+  id uuid primary key default gen_random_uuid(),
+  eyebrow text not null default 'NOVEDAD KNR',
+  title text not null,
+  description text not null default '',
+  image_url text not null,
+  link_url text not null default '#coleccion',
+  style text not null default 'urban' check (style in ('urban','luxury')),
+  active boolean not null default true,
+  priority integer not null default 0,
+  created_at timestamptz not null default now()
+);
+alter table public.store_banners enable row level security;
+drop policy if exists "Public can view active KNR banners" on public.store_banners;
+create policy "Public can view active KNR banners" on public.store_banners
+for select to anon, authenticated using (active = true or exists (
+  select 1 from public.admin_users where user_id = auth.uid()
+));
+drop policy if exists "KNR admins can insert banners" on public.store_banners;
+create policy "KNR admins can insert banners" on public.store_banners
+for insert to authenticated with check (exists (
+  select 1 from public.admin_users where user_id = auth.uid()
+));
+drop policy if exists "KNR admins can update banners" on public.store_banners;
+create policy "KNR admins can update banners" on public.store_banners
+for update to authenticated using (exists (
+  select 1 from public.admin_users where user_id = auth.uid()
+)) with check (exists (
+  select 1 from public.admin_users where user_id = auth.uid()
+));
+drop policy if exists "KNR admins can delete banners" on public.store_banners;
+create policy "KNR admins can delete banners" on public.store_banners
+for delete to authenticated using (exists (
+  select 1 from public.admin_users where user_id = auth.uid()
+));
