@@ -553,3 +553,16 @@ main#inicio{scroll-margin-top:82px}
 .product-card .quick-add:disabled{opacity:.35;cursor:not-allowed;filter:grayscale(1)}
 .luxury .product-card-bottom .saving-note b{background:#9b7846}
 @media(max-width:650px){.product-card-bottom{gap:6px;margin-top:7px;min-height:45px}.product-card-bottom .price-row strong{font-size:13px}.product-card-bottom .price-row del{font-size:10px}.product-card-bottom .saving-note{font-size:8px;gap:5px}}
+
+
+/* Galería de producto: navegación táctil y teclado */
+.modal-main-image{position:relative;isolation:isolate}
+.gallery-arrow{position:absolute;z-index:2;top:50%;transform:translateY(-50%);width:38px;height:38px;display:grid;place-items:center;border:1px solid #ffffff75;background:#111b;color:#fff;transition:background .18s,border-color .18s}
+.gallery-prev{left:12px}.gallery-next{right:12px}
+.gallery-arrow:hover{background:var(--accent);border-color:var(--accent);color:#111}
+.gallery-arrow:focus-visible,.thumbs button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.thumbs button{flex:0 0 60px;min-width:60px;min-height:60px;border:1px solid var(--line);padding:0;background:var(--bg);overflow:hidden}
+.thumbs button.thumb-active{border:2px solid var(--accent)}
+.thumbs button img{display:block;width:100%;height:100%;object-fit:cover}
+@media(max-width:650px){.gallery-arrow{width:34px;height:34px}.gallery-prev{left:8px}.gallery-next{right:8px}.modal-gallery{min-width:0}.thumbs{overflow-x:auto;padding:3px 2px 7px;scrollbar-width:thin}}
+@media(prefers-reduced-motion:reduce){.gallery-arrow{transition:none}}
