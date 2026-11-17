@@ -124,3 +124,8 @@ create policy "KNR admins can delete banners" on public.store_banners
 for delete to authenticated using (exists (
   select 1 from public.admin_users where user_id = auth.uid()
 ));
+
+-- Permite campañas universales además de campañas por ambiente.
+alter table public.store_banners drop constraint if exists store_banners_style_check;
+alter table public.store_banners add constraint store_banners_style_check
+check (style in ('urban','luxury','all'));
