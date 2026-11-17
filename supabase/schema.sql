@@ -176,6 +176,7 @@ create table if not exists public.orders (
   updated_at timestamptz not null default now()
 );
 alter table public.orders enable row level security;
+grant select, update on public.orders to authenticated;
 drop policy if exists "KNR admins can read orders" on public.orders;
 create policy "KNR admins can read orders" on public.orders for select to authenticated
 using (exists (select 1 from public.admin_users where user_id=auth.uid()));
