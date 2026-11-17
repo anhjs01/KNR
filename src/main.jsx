@@ -2,6 +2,8 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ArrowDownRight, ArrowLeft, ArrowRight, Check, ChevronDown, Clock3, Headphones, Menu, Minus, Plus, Search, ShoppingBag, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import './styles.css';
+import Admin from './Admin.jsx';
+import { supabase } from './lib/supabase.js';
 
 const seedProducts = [
   {id:'knr-01',name:'Noir Chronograph',category:'Relojes',style:'urban',price:189000,oldPrice:229000,discount:17,tag:'MÁS VENDIDO',description:'Presencia contundente, líneas limpias y un acabado negro que combina con todo. Una pieza para llevar tu propio ritmo.',specs:['Movimiento de cuarzo','Correa ajustable','Resistente a salpicaduras*'],images:['https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=1000&q=85','https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&w=1000&q=85']},
@@ -19,6 +21,7 @@ function App(){
  const [active,setActive]=useState(null),[cartOpen,setCartOpen]=useState(false),[comboMode,setComboMode]=useState(false),[query,setQuery]=useState(''),[mobileMenu,setMobileMenu]=useState(false),[musicOn,setMusicOn]=useState(false),[song,setSong]=useState(0);
  const songs=[{name:'Night Drive',type:'Urban mood'},{name:'After Hours',type:'Smooth selection'},{name:'Golden Hour',type:'Luxury mood'}];
  useEffect(()=>localStorage.setItem('knr-products',JSON.stringify(products)),[products]);
+ useEffect(()=>{if(!supabase)return;supabase.from('products').select('*').eq('active',true).order('created_at',{ascending:false}).then(({data})=>{if(data?.length)setProducts(data.map(p=>({...p,oldPrice:p.old_price,images:p.image_urls||[],specs:p.specs||[]})))})},[]);
  useEffect(()=>localStorage.setItem('knr-cart',JSON.stringify(cart)),[cart]);
  const visible=useMemo(()=>products.filter(p=>(filter==='Todo'||p.category===filter)&&(style==='all'||p.style===style)&&p.name.toLowerCase().includes(query.toLowerCase())),[products,filter,style,query]);
  const subtotal=cart.reduce((s,x)=>s+x.price*x.qty,0),discount=cart.reduce((s,x)=>s+(x.oldPrice?Math.max(0,x.oldPrice-x.price)*x.qty:0),0);
@@ -31,7 +34,7 @@ function App(){
   <header className="header">
    <button className="icon-btn mobile-only" onClick={()=>setMobileMenu(!mobileMenu)} aria-label="Abrir menú"><Menu/></button>
    <a className="logo" href="#" onClick={()=>{setFilter('Todo');setStyle('urban')}}>KNR<span>®</span></a>
-   <nav className={mobileMenu?'nav open':'nav'}><button className={style==='urban'?'nav-link selected':''} onClick={()=>{setStyle('urban');setMobileMenu(false)}}>URBAN</button><button className={style==='luxury'?'nav-link selected':''} onClick={()=>{setStyle('luxury');setMobileMenu(false)}}>LUXURY</button><a className="nav-link" href="#coleccion" onClick={()=>setMobileMenu(false)}>COLECCIÓN</a><a className="nav-link" href="#combos" onClick={()=>setMobileMenu(false)}>ARMA TU COMBO</a></nav>
+   <nav className={mobileMenu?'nav open':'nav'}><button className={style==='urban'?'nav-link selected':''} onClick={()=>{setStyle('urban');setMobileMenu(false)}}>URBAN</button><button className={style==='luxury'?'nav-link selected':''} onClick={()=>{setStyle('luxury');setMobileMenu(false)}}>LUXURY</button><a className="nav-link" href="#coleccion" onClick={()=>setMobileMenu(false)}>COLECCIÓN</a><a className="nav-link" href="#combos" onClick={()=>setMobileMenu(false)}>ARMA TU COMBO</a><a className="nav-link admin-nav" href="/admin">ADMIN</a></nav>
    <div className="header-actions"><label className="searchbox"><Search size={16}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar"/></label><button className="bag-btn" onClick={()=>setCartOpen(true)} aria-label="Abrir carrito"><ShoppingBag size={19}/><span> {cart.reduce((s,x)=>s+x.qty,0)}</span></button></div>
   </header>
   <main>
@@ -55,4 +58,4 @@ function App(){
   {comboMode&&<div className="overlay"><div className="combo-modal"><button className="close" onClick={()=>setComboMode(false)}><X/></button><div className="eyebrow"><span className="eyebrow-line"/>KNR COMBO STUDIO</div><h2>ARMA TU <em>COMBO.</em></h2><p>Empieza por un reloj y suma los accesorios que completen tu estilo.</p><div className="combo-steps"><span className="step-active">01 · RELOJ</span><span>02 · ACCESORIOS</span><span>03 · TU CARRITO</span></div><div className="combo-options">{products.filter(p=>p.category==='Relojes').map(p=><button key={p.id} onClick={()=>{add(p);setComboMode(false);setCartOpen(true)}}><img src={p.images[0]} alt={p.name}/><span>{p.name}</span><strong>{money(p.price)}</strong><Plus size={16}/></button>)}</div><div className="combo-accessories"><span>DESPUÉS PUEDES SUMAR GAFAS, GORRAS Y PERFUMES DESDE LA COLECCIÓN.</span><button className="btn-outline" onClick={()=>{setFilter('Todo');setComboMode(false);document.getElementById('coleccion')?.scrollIntoView({behavior:'smooth'})}}>VER ACCESORIOS <ArrowRight size={15}/></button></div></div></div>}
  </div>
 }
-createRoot(document.getElementById('root')).render(<App/>);
+createRoot(document.getElementById('root')).render(window.location.pathname.replace(/\\/$/,'')==='/admin'?<Admin/>:<App/>);
