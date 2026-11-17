@@ -583,3 +583,27 @@ main#inicio{scroll-margin-top:82px}
 @media(min-width:721px){.product-modal{grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr)}.modal-gallery{min-width:0;align-self:start}.modal-info{padding-top:66px}}
 @media(max-width:720px){.product-modal{width:min(540px,100%);grid-template-columns:minmax(0,1fr)}.modal-info{padding:22px 22px 25px}.modal-info .product-price-panel{padding:13px}.modal-info .btn-primary,.modal-info .btn-outline{min-height:49px}}
 @media(prefers-reduced-motion:reduce){.modal-info .btn-primary,.modal-info .btn-outline{transition:none}}
+
+
+/* Carrito: desglose por artículo y resumen más legible */
+.cart-item{align-items:center;gap:14px}
+.cart-item>img{flex:0 0 76px;border:1px solid var(--line);background:var(--bg)}
+.cart-item-info{flex:1;min-width:0;gap:7px}
+.cart-item-info>strong{font-size:12px;line-height:1.35;overflow-wrap:anywhere}
+.cart-line-prices{display:flex;flex-wrap:wrap;align-items:center;gap:7px;font-size:10px;color:var(--muted)}
+.cart-line-prices del,.cart-line-old-total{color:var(--muted);font-size:9px}
+.cart-line-end{flex:0 0 auto;min-width:86px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;font-variant-numeric:tabular-nums}
+.cart-line-end>strong{font-size:12px}
+.cart-item-saving{font-size:8px;color:#79b98d;white-space:nowrap}
+.cart-line-end .remove{margin:3px 0 0;padding:5px 0 5px 8px;letter-spacing:.8px}
+.qty{gap:10px}
+.qty button{width:28px;height:28px;transition:background .15s,border-color .15s}
+.qty button:not(:disabled):hover{background:var(--accent);border-color:var(--accent);color:#111}
+.qty button:focus-visible,.remove:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.cart-total{background:var(--panel);padding-top:15px}
+.cart-total .cart-summary-heading{padding-bottom:10px;border-bottom:1px solid var(--line);font-size:9px;letter-spacing:1px;font-weight:800}
+.cart-total .cart-summary-heading small{font-size:9px;color:var(--muted);font-weight:500}
+.cart-total .cart-saving{color:#79b98d}
+.cart-total .grand-total strong{font-variant-numeric:tabular-nums;font-size:19px}
+.cart-total .btn-primary{min-height:49px}
+@media(max-width:420px){.cart-drawer{padding:18px}.cart-item{gap:10px}.cart-item>img{flex-basis:64px;width:64px;height:78px}.cart-line-end{min-width:74px}.cart-line-end>strong{font-size:11px}.cart-item-info>strong{font-size:11px}.qty{gap:8px}}
