@@ -22,7 +22,7 @@ VITE_SUPABASE_URL=https://TU-PROYECTO.supabase.co
 VITE_SUPABASE_ANON_KEY=TU_CLAVE_PUBLICA
 ```
 
-4. Abre **SQL Editor** en Supabase y ejecuta el contenido completo de `supabase/schema.sql`. Si ya habías configurado Supabase antes de esta actualización, vuelve a ejecutar el archivo completo: añade columnas multimedia, inventario y costo de compra, la tabla privada `operating_expenses`, la biblioteca `music_tracks`, la tabla privada `orders`, sus políticas RLS y la función transaccional `place_order`. La función también valida y calcula en servidor los descuentos de combos; vuelve a ejecutar el archivo para aplicar esta corrección.
+4. Abre **SQL Editor** en Supabase y ejecuta el contenido completo de `supabase/schema.sql`. Si ya habías configurado Supabase antes de esta actualización, vuelve a ejecutar el archivo completo: añade columnas multimedia e inventario, las tablas privadas `product_costs` y `operating_expenses`, la biblioteca `music_tracks`, la tabla privada `orders`, sus políticas RLS y la función transaccional `place_order`. La función también valida y calcula en servidor los descuentos de combos; vuelve a ejecutar el archivo para aplicar esta corrección.
 5. En **Authentication → Users**, crea el usuario administrador con correo y contraseña.
 6. Copia su UUID y autorízalo ejecutando en SQL Editor:
 
@@ -41,7 +41,7 @@ La clave usada en el frontend debe ser la clave pública de Supabase. Nunca colo
 - Catálogo conectado a Supabase cuando se configura el backend; los productos de muestra sirven como vista previa mientras no haya catálogo.
 - Filtros y búsqueda, ficha de producto y galería de imágenes.
 - Carrito guardado en el navegador y límites de unidades disponibles cuando el producto tiene inventario controlado.
-- Inventario por producto: activa el control de stock desde el administrador, define las unidades y la tienda bloquea la compra cuando no quedan existencias. Registra también el costo de compra por unidad para calcular la utilidad bruta.
+- Inventario por producto: activa el control de stock desde el administrador, define las unidades y la tienda bloquea la compra cuando no quedan existencias. Registra también el costo de compra por unidad en una tabla privada de administración (no se expone en el catálogo público) para calcular la utilidad bruta.
 - Pedidos persistidos en Supabase mediante `place_order`: el servidor vuelve a comprobar disponibilidad, calcula el total con precios vigentes, valida el combo (mínimo dos artículos y al menos un reloj), aplica el descuento correspondiente solo a sus artículos y descuenta el inventario de forma transaccional. El pedido conserva el precio de lista y el precio aplicado por unidad.
 - Panel privado de pedidos con datos de entrega, detalle de artículos, total y estados: pendiente, confirmado, preparando, enviado, entregado o cancelado.
 - Resumen administrativo de pedidos, pendientes, ventas entregadas y alertas de inventario bajo (5 unidades o menos), con acceso directo para ajustar el stock.
