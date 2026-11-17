@@ -22,7 +22,7 @@ VITE_SUPABASE_URL=https://TU-PROYECTO.supabase.co
 VITE_SUPABASE_ANON_KEY=TU_CLAVE_PUBLICA
 ```
 
-4. Abre **SQL Editor** en Supabase y ejecuta el contenido completo de `supabase/schema.sql`.
+4. Abre **SQL Editor** en Supabase y ejecuta el contenido completo de `supabase/schema.sql`. Si ya habías configurado Supabase antes de esta actualización, vuelve a ejecutar el archivo para crear también la tabla de campañas `store_banners` y sus políticas.
 5. En **Authentication → Users**, crea el usuario administrador con correo y contraseña.
 6. Copia su UUID y autorízalo ejecutando en SQL Editor:
 
