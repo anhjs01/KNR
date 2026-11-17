@@ -62,3 +62,12 @@
 .monthly-sales-row strong{font-size:11px;color:#eee;text-align:right;white-space:nowrap}
 .monthly-sales-row small{font-size:10px;color:#999;text-align:right;white-space:nowrap}
 @media(max-width:620px){.admin-sales-summary{grid-template-columns:1fr}.monthly-sales-row{grid-template-columns:48px minmax(30px,1fr) auto;gap:7px}.monthly-sales-row small{grid-column:3;text-align:right}.monthly-sales-row strong{grid-column:3;grid-row:1}}
+
+
+.admin-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+.admin-stats article:nth-child(6) strong{color:#d7b77f}
+.admin-stats article:nth-child(7) strong{color:#8fc69b}
+.admin-stats article:nth-child(8) strong{color:#d7b77f}
+.top-product-list>div strong{font-size:11px}
+@media(max-width:900px){.admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:440px){.admin-stats{grid-template-columns:1fr}}
