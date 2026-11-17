@@ -95,3 +95,8 @@ En `/admin`, cada producto con control de inventario permite configurar un punto
 - El carrito presenta el precio de lista, el ahorro por descuentos y el total estimado por separado.
 - Cada línea muestra subtotal por producto, precio unitario, controles accesibles de cantidad y disponibilidad cuando hay inventario controlado.
 - El resumen indica el número total de unidades; la validación definitiva del inventario sigue realizándose al registrar el pedido.
+
+### Revisión previa al checkout
+- Antes de compartir los datos, el checkout muestra los artículos, cantidades, subtotales y ahorro aplicado.
+- Los campos de contacto y dirección usan atributos de autocompletado y el teléfono tiene validación básica de formato/longitud.
+- El costo de envío permanece por confirmar; no se suma un valor de envío inventado.
