@@ -239,3 +239,30 @@ end;
 $$;
 revoke all on function public.place_order(jsonb,jsonb) from public;
 grant execute on function public.place_order(jsonb,jsonb) to anon, authenticated;
+
+-- Al cancelar un pedido aún no despachado, devuelve al inventario las unidades reservadas.
+create or replace function public.restore_cancelled_order_stock()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  v_item jsonb;
+begin
+  if old.status = 'cancelled' and new.status <> 'cancelled' then
+    raise exception 'Un pedido cancelado no puede reactivarse; crea un pedido nuevo.';
+  end if;
+  if new.status = 'cancelled' and old.status <> 'cancelled' then
+    if old.status in ('shipped','delivered') then
+      raise exception 'Un pedido enviado o entregado requiere gestión de devolución; no se restaura el stock automáticamente.';
+    end if;
+    for v_item in select value from jsonb_array_elements(old.items)
+    loop
+      update public.products
+        set stock = stock + (v_item->>'qty')::integer
+        where id = (v_item->>'id')::uuid and track_inventory = true;
+    end loop;
+  end if;
+  return new;
+end;
+$$;
+drop trigger if exists orders_restore_stock_on_cancel on public.orders;
+create trigger orders_restore_stock_on_cancel before update of status on public.orders
+for each row execute function public.restore_cancelled_order_stock();
