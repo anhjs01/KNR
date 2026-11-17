@@ -607,3 +607,27 @@ main#inicio{scroll-margin-top:82px}
 .cart-total .grand-total strong{font-variant-numeric:tabular-nums;font-size:19px}
 .cart-total .btn-primary{min-height:49px}
 @media(max-width:420px){.cart-drawer{padding:18px}.cart-item{gap:10px}.cart-item>img{flex-basis:64px;width:64px;height:78px}.cart-line-end{min-width:74px}.cart-line-end>strong{font-size:11px}.cart-item-info>strong{font-size:11px}.qty{gap:8px}}
+
+
+/* Checkout: jerarquía de datos y ergonomía */
+.checkout-modal{width:min(660px,100%);max-height:min(90dvh,900px);scrollbar-gutter:stable}
+.checkout-modal>p{margin:0 0 18px}
+.checkout-section-title{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:18px 0 2px;padding-bottom:9px;border-bottom:1px solid var(--line);font:700 9px Manrope;letter-spacing:1.5px;color:var(--text)}
+.checkout-section-title span{display:grid;place-items:center;width:22px;height:22px;border:1px solid var(--accent);border-radius:50%;font-size:9px;color:var(--accent)}
+.checkout-fields label{font-size:11px;color:var(--text);font-weight:600}
+.checkout-fields input{border-radius:2px;min-height:46px;transition:border-color .18s,background .18s}
+.checkout-fields input::placeholder{color:var(--muted);opacity:.72}
+.checkout-fields input:focus{border-color:var(--accent);background:color-mix(in srgb,var(--bg) 88%,var(--accent))}
+.field-required{display:inline-block;margin-left:5px;color:var(--accent);font-size:7px;letter-spacing:1px;font-weight:700}
+.checkout-review-saving:last-child{padding-bottom:3px}
+.checkout-total{margin-top:14px;padding:15px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.checkout-total strong{font-size:21px;color:var(--accent)}
+.privacy-note{border-left:2px solid var(--accent)}
+.checkout-modal button[type=submit]{letter-spacing:1px}
+@media(max-width:600px){
+ .checkout-modal{max-height:100dvh;scrollbar-gutter:auto}
+ .checkout-section-title{margin-top:14px}
+ .checkout-fields label{margin:8px 0}
+ .checkout-fields input{min-height:48px}
+ .checkout-modal .checkout-order-review{margin-top:12px}
+}
