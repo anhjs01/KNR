@@ -207,13 +207,16 @@ begin
     or coalesce(trim(p_customer->>'address'),'') = '' then
     raise exception 'Completa los datos obligatorios de entrega.';
   end if;
-  if jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) = 0 then
+  if p_items is null or jsonb_typeof(p_items) is distinct from 'array' then
+    raise exception 'El formato del carrito no es válido.';
+  end if;
+  if jsonb_array_length(p_items) = 0 then
     raise exception 'El carrito está vacío.';
   end if;
   for v_item in select value from jsonb_array_elements(p_items)
   loop
     v_qty := (v_item->>'qty')::integer;
-    if v_qty < 1 or v_qty > 20 then raise exception 'Cantidad de producto no válida.'; end if;
+    if v_qty is null or v_qty < 1 or v_qty > 20 then raise exception 'Cantidad de producto no válida.'; end if;
     select * into v_product from public.products
       where id = (v_item->>'id')::uuid and active = true for update;
     if not found then raise exception 'Uno de los productos ya no está disponible.'; end if;
