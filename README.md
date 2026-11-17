@@ -4,11 +4,18 @@ Tienda KNR en React + Vite. Incluye catálogo responsive, selector Urban/Luxury,
 
 ## Ejecutar localmente
 
+No abras `index.html` directamente desde el explorador de archivos: es el punto de entrada de Vite y necesita que el servidor compile React y CSS.
+
 ```bash
 npm install
-cp .env.example .env.local
 npm run dev
 ```
+
+Abre en el navegador la dirección local que Vite muestre en la terminal (normalmente `http://localhost:5173`).
+
+### Modo demostración y pruebas visuales
+
+Si no configuras `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`, la tienda muestra productos de ejemplo y activa una franja de **MODO DEMOSTRACIÓN**. Puedes probar el catálogo, filtros, fichas, carrito, combos y formulario de entrega. Al enviar el formulario aparece una vista previa del pedido; no se guarda ni se envía a WhatsApp. El botón **REINICIAR PRUEBA** restaura los productos de muestra y vacía el carrito. Para pedidos reales, configura Supabase y `VITE_WHATSAPP_NUMBER` en un archivo `.env.local` (no lo subas al repositorio).
 
 ## Configurar Supabase
 
