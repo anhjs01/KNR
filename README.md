@@ -58,6 +58,6 @@ La clave usada en el frontend debe ser la clave pública de Supabase. Nunca colo
 - Los productos de muestra y fotografías de Unsplash son referencias de diseño; reemplázalos por inventario, imágenes y especificaciones verificadas.
 - La biblioteca musical necesita pistas de audio autorizadas cargadas desde `/admin`.
 - El panel administrativo gestiona catálogo, inventario, banners, vídeos, música y pedidos. La confirmación del pedido y la coordinación de entrega siguen dependiendo de la conversación con el cliente.
-- El pedido queda registrado con estado `pending` antes de abrir WhatsApp. WhatsApp no confirma pagos ni entregas: el equipo debe actualizar manualmente el estado desde `/admin`.
+- El pedido queda registrado con estado `pending` antes de abrir WhatsApp. WhatsApp no confirma pagos ni entregas: el equipo debe actualizar manualmente el estado desde `/admin`. Si se cancela antes del despacho, el inventario reservado se devuelve automáticamente; los pedidos enviados o entregados requieren gestión de devolución.
 - Añade aviso de privacidad y define el tratamiento de datos personales conforme a la normativa colombiana antes de operar.
 - Prueba la aplicación en un entorno de despliegue y configura las variables de entorno en el proveedor de hosting.
