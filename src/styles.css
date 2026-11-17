@@ -487,3 +487,44 @@ main#inicio{scroll-margin-top:82px}
 @media(prefers-reduced-motion:reduce){
  .app,.app .header,.app .ticker,.app footer,.app .product-image,.app .combo-copy,.app .sound-pill{transition:none}
 }
+
+
+/* Tarjetas de catálogo: jerarquía, interacción y lectura de inventario */
+.product-card{display:flex;flex-direction:column;min-width:0}
+.product-image{isolation:isolate;outline-offset:4px}
+.product-image:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.product-image .discount,.product-image .product-tag,.product-image .sold-out-tag{z-index:1}
+.product-image .sold-out-tag{background:#171717eF;color:#fff;border:1px solid #ffffff35}
+.product-meta{gap:10px;align-items:flex-start}
+.product-meta>div{min-width:0}
+.product-meta h3{overflow-wrap:anywhere;line-height:1.35}
+.quick-add{flex:0 0 34px;transition:background .2s,border-color .2s,color .2s,transform .2s}
+.quick-add:not(:disabled):hover{background:var(--accent);border-color:var(--accent);color:#111;transform:translateY(-1px)}
+.quick-add:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.price-row{min-height:18px;flex-wrap:wrap;row-gap:4px;font-variant-numeric:tabular-nums}
+.product-card .saving-note{line-height:1.4}
+.product-card .stock-note{display:flex;align-items:center;gap:8px;min-height:12px;line-height:1.35}
+.product-card .stock-note:before{content:"";width:5px;height:5px;flex:0 0 5px;border-radius:50%;background:currentColor;opacity:.75}
+.product-card .stock-low{color:#d99b65}
+.product-card .stock-note:not(.stock-low){color:var(--muted)}
+.luxury .product-card .stock-low{color:#986d3c}
+@media(max-width:900px){
+ .product-card{min-width:0}
+ .product-meta h3{font-size:13px}
+}
+@media(max-width:650px){
+ .product-image{aspect-ratio:4/5}
+ .product-meta{gap:7px}
+ .product-meta h3{font-size:12px;line-height:1.3}
+ .quick-add{flex-basis:30px;width:30px;height:30px}
+ .product-card .stock-note{min-height:18px;letter-spacing:.55px}
+}
+@media(max-width:360px){
+ .product-grid{column-gap:9px}
+ .product-meta h3{font-size:11px}
+ .product-image .discount{top:8px;left:8px;padding:5px 6px;font-size:8px}
+ .product-image .product-tag{bottom:8px;left:8px;padding:5px 6px;font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){
+ .quick-add{transition:none}
+}
