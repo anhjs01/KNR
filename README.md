@@ -45,7 +45,9 @@ La clave usada en el frontend debe ser la clave pública de Supabase. Nunca colo
 - Formulario de entrega: nombre, teléfono, barrio, dirección, detalles de apartamento/conjunto/piso y persona que recibe.
 - Resumen del pedido preparado para WhatsApp. El cliente revisa y envía el mensaje desde su propia cuenta.
 - Panel `/admin` con login, alta/edición/eliminación de productos, visibilidad, precio base, descuento porcentual y subida de imágenes.
-- Gestor de campañas y banners de portada: texto, imagen pública, enlace, prioridad, visibilidad y ambiente Urban/Luxury/Todos. La portada consume el banner activo de mayor prioridad para el ambiente elegido.
+- Gestor de campañas y banners de portada: texto, imagen o vídeo MP4 público, enlace, prioridad, visibilidad y ambiente Urban/Luxury/Todos. La portada consume la campaña activa de mayor prioridad para el ambiente elegido.
+- Ficha de producto con vídeo MP4 opcional además de fotografías.
+- Biblioteca musical administrable por ambiente: nombre, URL directa de audio, prioridad y publicación. El reproductor discreto reproduce la lista activa correspondiente a Urban o Luxury y pasa a la siguiente pista al terminar.
 - Favicon KNR.
 
 ## Importante antes de publicar
