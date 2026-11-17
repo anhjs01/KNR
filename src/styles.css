@@ -474,7 +474,7 @@ main#inicio{scroll-margin-top:82px}
 .luxury .product-image{background:#dedbd3}
 .luxury .product-image img{filter:saturate(.48) contrast(1.04)}
 .luxury .product-card .product-meta h3{letter-spacing:-.25px}
-.luxury .product-image .quick-view{background:#9b7846;color:#fff}
+.luxury .product-image .quick-view{background:#9b7846;color:#111}
 .luxury .combo-image{filter:grayscale(.82) contrast(1.08)}
 .luxury .ticker{background:#dedbd3}
 .luxury .values>div{border-left-color:var(--line)}
