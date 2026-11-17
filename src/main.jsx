@@ -33,7 +33,7 @@ function App(){
  const categories=['Todo','Relojes','Gafas','Gorras','Perfumería'];
  return <div className={style==='luxury'?'app luxury':'app'}>
   <div className="announcement"><span>ENVÍOS A COLOMBIA</span><i/> <span>ARMA TU COMBO Y ENCUENTRA TU ESTILO</span><i/> <span>COMPRA FÁCIL POR WHATSAPP</span></div>
-  {!supabase&&<div className="demo-ribbon"><span><b>MODO DEMOSTRACIÓN</b> · Estás probando productos de ejemplo. No se envían pedidos reales.</span><button type="button" onClick={()=>{setProducts(seedProducts);setCart([]);setFilter("Todo");setQuery("");setStyle("urban");setActive(null);setCartOpen(false);setCheckoutOpen(false);setComboMode(false);setDemoMessage("");}}>REINICIAR PRUEBA</button></div>}
+  {!supabase&&<div className="demo-ribbon"><span><b>MODO DEMOSTRACIÓN</b> · Estás probando productos de ejemplo. No se envían pedidos reales.</span><button type="button" onClick={()=>{setProducts(seedProducts);setCart([]);setFilter("Todo");setQuery("");setSort("featured");setStyle("urban");setActive(null);setCartOpen(false);setCheckoutOpen(false);setComboMode(false);setDemoMessage("");}}>REINICIAR PRUEBA</button></div>}
   <header className="header">
    <button className="icon-btn mobile-only" onClick={()=>setMobileMenu(!mobileMenu)} aria-label={mobileMenu ? "Cerrar menú" : "Abrir menú"} aria-expanded={mobileMenu} aria-controls="knr-navigation">{mobileMenu ? <X/> : <Menu/>}</button>
    <a className="logo" href="#" onClick={()=>{setFilter('Todo');setStyle('urban')}}>KNR<span>®</span></a>
