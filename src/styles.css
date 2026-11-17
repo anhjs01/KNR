@@ -260,3 +260,19 @@ footer{gap:20px}footer .logo{margin-right:auto}
  .product-tag{max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
 @media(prefers-reduced-motion:reduce){.quick-add,.product-image{transition:none}}
+
+
+/* Controles de catálogo: orden de colección */
+.catalog-controls{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap}
+.sort-control{display:flex;align-items:center;gap:9px;min-height:38px;padding:0 11px;border:1px solid var(--line);background:var(--panel)}
+.sort-control>span{font-size:8px;letter-spacing:1.3px;color:var(--muted);white-space:nowrap}
+.sort-control select{max-width:150px;border:0;outline:0;background:transparent;color:var(--text);font:600 10px 'DM Sans',sans-serif;cursor:pointer}
+.sort-control select option{background:var(--panel);color:var(--text)}
+.sort-control:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 18%,transparent)}
+@media(max-width:650px){
+ .section-top{align-items:flex-start}
+ .catalog-controls{width:100%;justify-content:space-between;gap:8px}
+ .sort-control{flex:1;justify-content:space-between;min-width:0;padding:0 9px}
+ .sort-control select{max-width:125px;font-size:10px}
+ .catalog-controls .filter-button{white-space:nowrap}
+}
