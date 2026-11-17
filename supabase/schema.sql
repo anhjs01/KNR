@@ -26,6 +26,8 @@ create table if not exists public.products (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+alter table public.products add column if not exists reorder_level integer not null default 5 check (reorder_level >= 0);
+alter table public.products add column if not exists reorder_quantity integer not null default 10 check (reorder_quantity > 0);
 alter table public.products enable row level security;
 
 drop policy if exists "Public can view active KNR products" on public.products;
@@ -556,6 +558,31 @@ begin
         'delivered_revenue',coalesce(x.delivered_revenue,0)
       ) order by m.month_start)
       from months m left join monthly x on x.month_start=m.month_start
+    ),'[]'::jsonb)
+,    'inventory_forecast',coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'id',forecast.id,'name',forecast.name,'category',forecast.category,
+        'stock',forecast.stock,'units_sold_30d',forecast.units_sold_30d,
+        'average_daily_sales',round(forecast.units_sold_30d/30.0,2),
+        'days_until_stockout',case when forecast.units_sold_30d>0 then ceil(forecast.stock/(forecast.units_sold_30d/30.0))::integer else null end,
+        'reorder_level',forecast.reorder_level,'reorder_quantity',forecast.reorder_quantity,
+        'needs_restock',(forecast.stock<=forecast.reorder_level or (forecast.units_sold_30d>0 and forecast.stock/(forecast.units_sold_30d/30.0)<=14)),
+        'suggested_reorder',greatest(forecast.reorder_quantity,ceil(forecast.units_sold_30d)-forecast.stock,0)
+      ) order by (forecast.stock<=forecast.reorder_level or (forecast.units_sold_30d>0 and forecast.stock/(forecast.units_sold_30d/30.0)<=14)) desc,
+        case when forecast.units_sold_30d>0 then forecast.stock/(forecast.units_sold_30d/30.0) else 999999 end asc)
+      from (
+        select p.id,p.name,p.category,p.stock,p.reorder_level,p.reorder_quantity,
+          coalesce(s.units_sold,0)::numeric as units_sold_30d
+        from public.products p
+        left join lateral (
+          select sum(coalesce((line.value->>'qty')::numeric,0)) as units_sold
+          from public.orders o
+          cross join lateral jsonb_array_elements(o.items) as line(value)
+          where o.status='delivered' and o.created_at>=now()-interval '30 days'
+            and line.value->>'id'=p.id::text
+        ) s on true
+        where p.active=true and p.track_inventory=true
+      ) forecast
     ),'[]'::jsonb)
   ) into v_report;
 
