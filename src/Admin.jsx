@@ -12,7 +12,20 @@ export default function Admin(){
  const [session,setSession]=useState(null),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[items,setItems]=useState([]),[orders,setOrders]=useState([]),[form,setForm]=useState(blank),[editing,setEditing]=useState(null),[files,setFiles]=useState([]),[banners,setBanners]=useState([]),[bannerForm,setBannerForm]=useState({eyebrow:'NOVEDAD KNR',title:'',description:'',image_url:'',video_url:'',link_url:'#coleccion',style:'urban',active:true,priority:0}),[bannerEditing,setBannerEditing]=useState(null),[tracks,setTracks]=useState([]),[trackForm,setTrackForm]=useState({name:'',mood:'urban',audio_url:'',active:true,priority:0}),[trackEditing,setTrackEditing]=useState(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[orderStatusFilter,setOrderStatusFilter]=useState('all'),[orderFrom,setOrderFrom]=useState(''),[orderTo,setOrderTo]=useState(''),[orderPage,setOrderPage]=useState(0),[ordersTotal,setOrdersTotal]=useState(0),[ordersLoading,setOrdersLoading]=useState(false),[orderReport,setOrderReport]=useState(null),[exportingOrders,setExportingOrders]=useState(false),[expenses,setExpenses]=useState([]),[expenseForm,setExpenseForm]=useState({category:'Envio',description:'',amount:'',incurred_on:new Date().toLocaleDateString('en-CA')}),[expensesLoading,setExpensesLoading]=useState(false);
  useEffect(()=>{if(!supabase)return;supabase.auth.getSession().then(({data})=>setSession(data.session));const {data:{subscription}}=supabase.auth.onAuthStateChange((_e,s)=>setSession(s));return()=>subscription.unsubscribe()},[]);
  useEffect(()=>{if(session){load();loadBanners();loadTracks();loadOrders();loadExpenses()}},[session]);
- async function load(){setBusy(true);setError('');const {data,error}=await supabase.from('products').select('*').order('created_at',{ascending:false});if(error)setError(error.message);else setItems(data||[]);setBusy(false)}
+ async function load(){
+  setBusy(true);setError('');
+  const [{data,error},{data:costs,error:costError}]=await Promise.all([
+   supabase.from('products').select('*').order('created_at',{ascending:false}),
+   supabase.from('product_costs').select('product_id,cost_price')
+  ]);
+  if(error)setError(error.message);
+  else if(costError)setError('Costos privados: '+costError.message);
+  else{
+   const costMap=new Map((costs||[]).map(row=>[row.product_id,row.cost_price]));
+   setItems((data||[]).map(product=>({...product,cost_price:costMap.get(product.id)??0})));
+  }
+  setBusy(false);
+ }
  async function loadExpenses(){
   setExpensesLoading(true);
   const {data,error}=await supabase.from('operating_expenses').select('*').order('incurred_on',{ascending:false}).order('created_at',{ascending:false});
@@ -100,7 +113,23 @@ export default function Admin(){
  async function toggleTrack(t){const {error}=await supabase.from('music_tracks').update({active:!t.active}).eq('id',t.id);if(error)setError(error.message);else loadTracks()}
  async function login(e){e.preventDefault();setBusy(true);setError('');const {error}=await supabase.auth.signInWithPassword({email,password});if(error)setError('No fue posible iniciar sesión. Verifica tus credenciales y que el usuario administrador exista en Supabase.');setBusy(false)}
  async function uploadImages(){const urls=[...(form.image_urls||[])];for(const file of files){const path=`${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'-')}`;const {error}=await supabase.storage.from('product-media').upload(path,file,{upsert:false});if(error)throw error;const {data}=supabase.storage.from('product-media').getPublicUrl(path);urls.push(data.publicUrl)}return urls}
- async function save(e){e.preventDefault();setBusy(true);setError('');setNotice('');try{const image_urls=await uploadImages();const basePrice=Number(form.price);const percentage=Math.min(90,Math.max(0,Number(form.discount)||0));const payload={name:form.name.trim(),category:form.category,style:form.style,price:Math.round(basePrice*(1-percentage/100)),old_price:percentage>0?basePrice:null,discount:percentage,tag:form.tag,description:form.description,specs:form.specs.split('\n').map(x=>x.trim()).filter(Boolean),image_urls,video_url:form.video_url||null,stock:Math.max(0,Number(form.stock)||0),cost_price:Math.max(0,Math.round(Number(form.cost_price)||0)),track_inventory:!!form.track_inventory,active:form.active};const result=editing?await supabase.from('products').update(payload).eq('id',editing):await supabase.from('products').insert(payload);if(result.error)throw result.error;setForm(blank);setFiles([]);setEditing(null);setNotice('Producto guardado correctamente.');await load()}catch(e){setError(e.message||'No se pudo guardar el producto.')}setBusy(false)}
+ async function save(e){
+  e.preventDefault();setBusy(true);setError('');setNotice('');
+  try{
+   const image_urls=await uploadImages();
+   const basePrice=Number(form.price);
+   const percentage=Math.min(90,Math.max(0,Number(form.discount)||0));
+   const payload={name:form.name.trim(),category:form.category,style:form.style,price:Math.round(basePrice*(1-percentage/100)),old_price:percentage>0?basePrice:null,discount:percentage,tag:form.tag,description:form.description,specs:form.specs.split('\n').map(x=>x.trim()).filter(Boolean),image_urls,video_url:form.video_url||null,stock:Math.max(0,Number(form.stock)||0),track_inventory:!!form.track_inventory,active:form.active};
+   let productId=editing;
+   const result=editing?await supabase.from('products').update(payload).eq('id',editing):await supabase.from('products').insert(payload).select('id').single();
+   if(result.error)throw result.error;
+   if(!productId)productId=result.data.id;
+   const {error:costError}=await supabase.from('product_costs').upsert({product_id:productId,cost_price:Math.max(0,Math.round(Number(form.cost_price)||0)),updated_at:new Date().toISOString()},{onConflict:'product_id'});
+   if(costError)throw new Error('El producto se guardó, pero no se pudo guardar su costo privado: '+costError.message);
+   setForm(blank);setFiles([]);setEditing(null);setNotice('Producto y costo privado guardados correctamente.');await load();
+  }catch(e){setError(e.message||'No se pudo guardar el producto.')}
+  setBusy(false);
+ }
  function edit(p){setEditing(p.id);setForm({...p,price:p.old_price??p.price,specs:(p.specs||[]).join('\n'),image_urls:p.image_urls||[],stock:p.stock??0,cost_price:p.cost_price??0,track_inventory:!!p.track_inventory});setFiles([]);window.scrollTo({top:0,behavior:'smooth'})}
  async function remove(p){if(!confirm(`¿Eliminar “${p.name}” del catálogo?`))return;const {error}=await supabase.from('products').delete().eq('id',p.id);if(error)setError(error.message);else{setNotice('Producto eliminado.');load()}}
  async function toggle(p){const {error}=await supabase.from('products').update({active:!p.active}).eq('id',p.id);if(error)setError(error.message);else load()}
