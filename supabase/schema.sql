@@ -345,7 +345,8 @@ begin
       coalesce(item.value->>'id', item.value->>'name') as product_id,
       coalesce(item.value->>'name','Producto') as product_name,
       coalesce((item.value->>'qty')::integer,0) as qty,
-      coalesce((item.value->>'unit_price')::numeric,0) as unit_price
+      coalesce((item.value->>'unit_price')::numeric,0) as unit_price,
+      coalesce((item.value->>'unit_cost')::numeric,0) as unit_cost
     from filtered f
     cross join lateral jsonb_array_elements(f.items) as item(value)
     where f.status <> 'cancelled'
@@ -353,7 +354,9 @@ begin
   ranking as (
     select product_id, product_name,
       sum(qty)::integer as qty,
-      sum(qty * unit_price)::numeric as revenue,\n      sum(qty * coalesce((item.value->>'unit_cost')::numeric,0))::numeric as cost,\n      sum(qty * (unit_price-coalesce((item.value->>'unit_cost')::numeric,0)))::numeric as profit
+      sum(qty * unit_price)::numeric as revenue,
+      sum(qty * unit_cost)::numeric as cost,
+      sum(qty * (unit_price-unit_cost))::numeric as profit
     from product_lines
     group by product_id, product_name
     order by sum(qty) desc, sum(qty * unit_price) desc
