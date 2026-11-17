@@ -160,6 +160,7 @@ using (exists (select 1 from public.admin_users where user_id=auth.uid()));
 -- Inventario y pedidos con creación transaccional desde la tienda.
 alter table public.products add column if not exists stock integer not null default 0 check (stock >= 0);
 alter table public.products add column if not exists track_inventory boolean not null default false;
+alter table public.products add column if not exists cost_price integer not null default 0 check (cost_price >= 0);
 
 create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),
@@ -352,7 +353,7 @@ begin
   ranking as (
     select product_id, product_name,
       sum(qty)::integer as qty,
-      sum(qty * unit_price)::numeric as revenue
+      sum(qty * unit_price)::numeric as revenue,\n      sum(qty * coalesce((item.value->>'unit_cost')::numeric,0))::numeric as cost,\n      sum(qty * (unit_price-coalesce((item.value->>'unit_cost')::numeric,0)))::numeric as profit
     from product_lines
     group by product_id, product_name
     order by sum(qty) desc, sum(qty * unit_price) desc
@@ -376,9 +377,9 @@ begin
   select jsonb_build_object(
     'total_orders',(select count(*) from filtered),
     'pending_count',(select count(*) from filtered where status='pending'),
-    'delivered_revenue',(select coalesce(sum(total),0) from filtered where status='delivered'),
+    'delivered_revenue',(select coalesce(sum(total),0) from filtered where status='delivered'),\n    'delivered_cost',(select coalesce(sum((item.value->>'qty')::numeric*coalesce((item.value->>'unit_cost')::numeric,0)),0) from filtered f cross join lateral jsonb_array_elements(f.items) item(value) where f.status='delivered'),\n    'delivered_profit',(select coalesce(sum((item.value->>'qty')::numeric*((item.value->>'unit_price')::numeric-coalesce((item.value->>'unit_cost')::numeric,0))),0) from filtered f cross join lateral jsonb_array_elements(f.items) item(value) where f.status='delivered'),
     'top_products',coalesce((select jsonb_agg(jsonb_build_object(
-      'id',product_id,'name',product_name,'qty',qty,'revenue',revenue
+      'id',product_id,'name',product_name,'qty',qty,'revenue',revenue,'cost',cost,'profit',profit
     ) order by qty desc,revenue desc) from ranking),'[]'::jsonb),
     'monthly_sales',coalesce((
       select jsonb_agg(jsonb_build_object(
