@@ -129,3 +129,30 @@ for delete to authenticated using (exists (
 alter table public.store_banners drop constraint if exists store_banners_style_check;
 alter table public.store_banners add constraint store_banners_style_check
 check (style in ('urban','luxury','all'));
+
+-- Biblioteca de audio por ambiente. Solo se almacenan URLs que el comercio tiene derecho a reproducir.
+alter table public.products add column if not exists video_url text;
+alter table public.store_banners add column if not exists video_url text;
+create table if not exists public.music_tracks (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  mood text not null default 'urban' check (mood in ('urban','luxury','all')),
+  audio_url text not null,
+  active boolean not null default true,
+  priority integer not null default 0,
+  created_at timestamptz not null default now()
+);
+alter table public.music_tracks enable row level security;
+drop policy if exists "Public can view active KNR tracks" on public.music_tracks;
+create policy "Public can view active KNR tracks" on public.music_tracks
+for select to anon, authenticated using (active = true or exists (select 1 from public.admin_users where user_id=auth.uid()));
+drop policy if exists "KNR admins can insert tracks" on public.music_tracks;
+create policy "KNR admins can insert tracks" on public.music_tracks for insert to authenticated
+with check (exists (select 1 from public.admin_users where user_id=auth.uid()));
+drop policy if exists "KNR admins can update tracks" on public.music_tracks;
+create policy "KNR admins can update tracks" on public.music_tracks for update to authenticated
+using (exists (select 1 from public.admin_users where user_id=auth.uid()))
+with check (exists (select 1 from public.admin_users where user_id=auth.uid()));
+drop policy if exists "KNR admins can delete tracks" on public.music_tracks;
+create policy "KNR admins can delete tracks" on public.music_tracks for delete to authenticated
+using (exists (select 1 from public.admin_users where user_id=auth.uid()));
