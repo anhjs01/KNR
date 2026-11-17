@@ -235,3 +235,28 @@ footer{gap:20px}footer .logo{margin-right:auto}
  .checkout-total{padding:13px 0}
  .checkout-modal button[type=submit]{position:sticky;bottom:0;z-index:2;margin-top:12px;box-shadow:0 -10px 22px var(--panel);padding-bottom:max(13px,env(safe-area-inset-bottom))}
 }
+
+/* Catálogo: estados claros para ratón, teclado y pantallas táctiles */
+.product-card{display:flex;flex-direction:column}
+.product-image{isolation:isolate;border:1px solid transparent;transition:border-color .2s,box-shadow .2s}
+.product-image:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-color:var(--accent)}
+.product-image:focus-visible .quick-view{opacity:1;transform:none}
+.product-image img{display:block}
+.product-meta{gap:10px;align-items:flex-start}
+.product-meta>div{min-width:0}
+.product-meta h3{line-height:1.35;overflow-wrap:anywhere}
+.quick-add{flex:none;transition:background .2s,color .2s,border-color .2s,transform .2s}
+.quick-add:not(:disabled):hover{background:var(--accent);border-color:var(--accent);color:#17130d;transform:translateY(-1px)}
+.quick-add:disabled{opacity:.35;cursor:not-allowed}
+.product-card>.price-row{margin-top:auto;padding-top:10px}
+.product-card>.stock-note{margin-top:7px}
+.product-card .price-row strong{font-size:13px}
+.product-card .price-row del{font-size:10px}
+@media(hover:none){.product-image .quick-view{opacity:1;transform:none}}
+@media(max-width:650px){
+ .product-meta h3{font-size:12px;line-height:1.3}
+ .product-card>.price-row{padding-top:8px}
+ .product-card .price-row strong{font-size:12px}
+ .product-tag{max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
+@media(prefers-reduced-motion:reduce){.quick-add,.product-image{transition:none}}
