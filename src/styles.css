@@ -372,3 +372,19 @@ main#inicio{scroll-margin-top:82px}
  #coleccion,#combos{scroll-margin-top:78px}
  .nav.open .nav-link{min-height:43px;display:flex;align-items:center}
 }
+
+
+/* Información comercial clara en cada tarjeta */
+.saving-note{margin-top:5px;color:var(--accent);font-size:8px;font-weight:800;letter-spacing:1.15px}
+.product-card .price-row{gap:8px}
+.product-card .price-row del{opacity:.75}
+.product-card .price-row strong{font-variant-numeric:tabular-nums}
+.product-card .stock-note{font-size:8px;letter-spacing:1px}
+.product-card .stock-low{color:#d99b65}
+.product-card .stock-low:before{background:currentColor;box-shadow:0 0 0 3px color-mix(in srgb,currentColor 18%,transparent)}
+.product-card .product-image img{background:var(--panel)}
+@media(max-width:650px){
+ .saving-note{font-size:7px;letter-spacing:.8px}
+ .product-card .stock-note{font-size:7px;letter-spacing:.65px}
+}
+@media(prefers-reduced-motion:reduce){.product-image img{transition:none!important}}
