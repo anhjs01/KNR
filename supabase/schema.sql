@@ -160,7 +160,21 @@ using (exists (select 1 from public.admin_users where user_id=auth.uid()));
 -- Inventario y pedidos con creación transaccional desde la tienda.
 alter table public.products add column if not exists stock integer not null default 0 check (stock >= 0);
 alter table public.products add column if not exists track_inventory boolean not null default false;
-alter table public.products add column if not exists cost_price integer not null default 0 check (cost_price >= 0);
+alter table public.products drop column if exists cost_price;
+
+-- Costos de compra aislados de la tabla pública de productos.
+create table if not exists public.product_costs (
+  product_id uuid primary key references public.products(id) on delete cascade,
+  cost_price integer not null default 0 check (cost_price >= 0),
+  updated_at timestamptz not null default now()
+);
+alter table public.product_costs enable row level security;
+grant select, insert, update, delete on public.product_costs to authenticated;
+drop policy if exists "KNR admins manage product costs" on public.product_costs;
+create policy "KNR admins manage product costs" on public.product_costs
+for all to authenticated
+using (exists (select 1 from public.admin_users where user_id=auth.uid()))
+with check (exists (select 1 from public.admin_users where user_id=auth.uid()));
 
 create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),
@@ -205,6 +219,7 @@ declare
   v_combo_count integer := 0;
   v_combo_pct integer := 0;
   v_unit_price integer;
+  v_unit_cost integer := 0;
 begin
   if coalesce(trim(p_customer->>'name'),'') = ''
     or coalesce(trim(p_customer->>'phone'),'') = ''
@@ -254,6 +269,8 @@ begin
     end if;
 
     v_unit_price := v_product.price;
+    select coalesce(pc.cost_price,0) into v_unit_cost
+      from (select 1) seed left join public.product_costs pc on pc.product_id=v_product.id;
     if v_combo_pct > 0 and v_item->>'is_combo' = 'true' then
       v_unit_price := round(v_product.price * (100 - v_combo_pct) / 100.0)::integer;
     end if;
@@ -263,7 +280,7 @@ begin
       'name',v_product.name,
       'qty',v_qty,
       'unit_price',v_unit_price,
-      'unit_cost',v_product.cost_price,
+      'unit_cost',v_unit_cost,
       'list_price',v_product.price,
       'combo_discount_pct',case when v_item->>'is_combo' = 'true' then v_combo_pct else 0 end,
       'category',v_product.category,
@@ -311,6 +328,24 @@ $$;
 drop trigger if exists orders_restore_stock_on_cancel on public.orders;
 create trigger orders_restore_stock_on_cancel before update of status on public.orders
 for each row execute function public.restore_cancelled_order_stock();
+
+
+-- Gastos operativos registrados por el equipo administrativo.
+create table if not exists public.operating_expenses (
+  id uuid primary key default gen_random_uuid(),
+  category text not null check (category in ('Envio','Empaque','Publicidad','Comisiones','Operación','Otro')),
+  description text not null,
+  amount integer not null check (amount > 0),
+  incurred_on date not null default current_date,
+  created_at timestamptz not null default now()
+);
+alter table public.operating_expenses enable row level security;
+grant select, insert, update, delete on public.operating_expenses to authenticated;
+drop policy if exists "KNR admins manage operating expenses" on public.operating_expenses;
+create policy "KNR admins manage operating expenses" on public.operating_expenses
+for all to authenticated
+using (exists (select 1 from public.admin_users where user_id=auth.uid()))
+with check (exists (select 1 from public.admin_users where user_id=auth.uid()));
 
 
 -- Reporte histórico agregado: no depende de la página visible en el panel.
@@ -381,7 +416,9 @@ begin
   select jsonb_build_object(
     'total_orders',(select count(*) from filtered),
     'pending_count',(select count(*) from filtered where status='pending'),
-    'delivered_revenue',(select coalesce(sum(total),0) from filtered where status='delivered'),\n    'delivered_cost',(select coalesce(sum((item.value->>'qty')::numeric*coalesce((item.value->>'unit_cost')::numeric,0)),0) from filtered f cross join lateral jsonb_array_elements(f.items) item(value) where f.status='delivered'),\n    'delivered_profit',(select coalesce(sum((item.value->>'qty')::numeric*((item.value->>'unit_price')::numeric-coalesce((item.value->>'unit_cost')::numeric,0))),0) from filtered f cross join lateral jsonb_array_elements(f.items) item(value) where f.status='delivered'),
+    'delivered_revenue',(select coalesce(sum(total),0) from filtered where status='delivered'),
+    'delivered_cost',(select coalesce(sum((item.value->>'qty')::numeric*coalesce((item.value->>'unit_cost')::numeric,0)),0) from filtered f cross join lateral jsonb_array_elements(f.items) item(value) where f.status='delivered'),
+    'delivered_profit',(select coalesce(sum((item.value->>'qty')::numeric*((item.value->>'unit_price')::numeric-coalesce((item.value->>'unit_cost')::numeric,0))),0) from filtered f cross join lateral jsonb_array_elements(f.items) item(value) where f.status='delivered'),
     'operating_expenses',(select coalesce(sum(e.amount),0) from public.operating_expenses e
       where (p_from is null or e.incurred_on >= p_from::date)
         and (p_to is null or e.incurred_on <= p_to::date)),
@@ -421,19 +458,3 @@ revoke all on function public.admin_order_report(text,timestamptz,timestamptz) f
 grant execute on function public.admin_order_report(text,timestamptz,timestamptz) to authenticated;
 
 
--- Gastos operativos registrados por el equipo administrativo.
-create table if not exists public.operating_expenses (
-  id uuid primary key default gen_random_uuid(),
-  category text not null check (category in ('Envio','Empaque','Publicidad','Comisiones','Operación','Otro')),
-  description text not null,
-  amount integer not null check (amount > 0),
-  incurred_on date not null default current_date,
-  created_at timestamptz not null default now()
-);
-alter table public.operating_expenses enable row level security;
-grant select, insert, update, delete on public.operating_expenses to authenticated;
-drop policy if exists "KNR admins manage operating expenses" on public.operating_expenses;
-create policy "KNR admins manage operating expenses" on public.operating_expenses
-for all to authenticated
-using (exists (select 1 from public.admin_users where user_id=auth.uid()))
-with check (exists (select 1 from public.admin_users where user_id=auth.uid()));
