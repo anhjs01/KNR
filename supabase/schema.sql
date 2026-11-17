@@ -263,6 +263,7 @@ begin
       'name',v_product.name,
       'qty',v_qty,
       'unit_price',v_unit_price,
+      'unit_cost',v_product.cost_price,
       'list_price',v_product.price,
       'combo_discount_pct',case when v_item->>'is_combo' = 'true' then v_combo_pct else 0 end,
       'category',v_product.category,
@@ -359,7 +360,7 @@ begin
       sum(qty * (unit_price-unit_cost))::numeric as profit
     from product_lines
     group by product_id, product_name
-    order by sum(qty) desc, sum(qty * unit_price) desc
+    order by sum(qty * (unit_price-unit_cost)) desc, sum(qty * unit_price) desc
     limit 5
   ),
   months as (
