@@ -45,7 +45,8 @@ La clave usada en el frontend debe ser la clave pública de Supabase. Nunca colo
 - Pedidos persistidos en Supabase mediante `place_order`: el servidor vuelve a comprobar disponibilidad, calcula el total con precios vigentes, valida el combo (mínimo dos artículos y al menos un reloj), aplica el descuento correspondiente solo a sus artículos y descuenta el inventario de forma transaccional. El pedido conserva el precio de lista y el precio aplicado por unidad.
 - Panel privado de pedidos con datos de entrega, detalle de artículos, total y estados: pendiente, confirmado, preparando, enviado, entregado o cancelado.
 - Resumen administrativo de pedidos, pendientes, ventas entregadas y alertas de inventario bajo (5 unidades o menos), con acceso directo para ajustar el stock.
-- Reporte de ventas con filtros por estado y fechas, además de ranking de los cinco productos con más unidades vendidas. El panel consulta hasta 1.000 pedidos recientes; para analítica histórica completa se requiere paginación o agregación en base de datos.
+- Historial de pedidos paginado (50 por página), con filtros por estado y fechas, contador total y exportación CSV de la página visible.
+- Ranking de los cinco productos con más unidades en la página consultada; las métricas del panel reflejan los pedidos cargados en esa página y no deben interpretarse como acumulados históricos.
 - Constructor de combos: reloj obligatorio y accesorios opcionales. Descuento adicional automático por cantidad (2 productos: 5%, 3: 10%, 4 o más: 15%), aplicado al precio vigente de cada artículo.
 - Formulario de entrega: nombre, teléfono, barrio, dirección, detalles de apartamento/conjunto/piso y persona que recibe.
 - Resumen del pedido preparado para WhatsApp. El cliente revisa y envía el mensaje desde su propia cuenta.
