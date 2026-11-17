@@ -446,3 +446,22 @@ main#inicio{scroll-margin-top:82px}
  .checkout-modal .privacy-note{margin:12px 0}
 }
 @media(prefers-reduced-motion:reduce){.checkout-fields input{transition:none}}
+
+
+/* Navegación responsive: área táctil, jerarquía y estados */
+.menu-toggle{width:40px;height:40px;flex:0 0 40px;justify-content:center;border:1px solid var(--line);background:var(--panel);transition:color .2s,border-color .2s}
+.menu-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.nav-link[aria-pressed="true"]{color:var(--text)}
+.nav-link[aria-pressed="true"]:after{content:"";display:block;height:1px;background:var(--accent);margin-top:7px}
+@media(max-width:650px){
+ .nav.open{padding:12px 6% 18px;gap:0;box-shadow:0 18px 30px #0002}
+ .nav.open .nav-link{width:100%;min-height:48px;padding:13px 0;border-bottom:1px solid var(--line);font-size:10px;letter-spacing:1.4px}
+ .nav.open .nav-link:last-child{border-bottom:0}
+ .nav.open .nav-link[aria-pressed="true"]:after{display:none}
+ .menu-toggle{border-radius:0}
+ .header-actions{min-width:0}
+}
+@media(prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto}
+ .menu-toggle{transition:none}
+}
