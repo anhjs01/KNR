@@ -216,6 +216,48 @@ drop trigger if exists orders_updated_at on public.orders;
 create trigger orders_updated_at before update on public.orders
 for each row execute function public.set_updated_at();
 
+-- Historial auditable de cambios de estado de cada pedido.
+create table if not exists public.order_status_history (
+  id bigint generated always as identity primary key,
+  order_id uuid not null references public.orders(id) on delete cascade,
+  old_status text,
+  new_status text not null check (new_status in ('pending','confirmed','preparing','shipped','delivered','cancelled')),
+  changed_at timestamptz not null default now(),
+  changed_by uuid references auth.users(id) on delete set null
+);
+create index if not exists order_status_history_order_date_idx
+  on public.order_status_history(order_id, changed_at);
+
+alter table public.order_status_history enable row level security;
+grant select on public.order_status_history to authenticated;
+drop policy if exists "KNR admins can read order status history" on public.order_status_history;
+create policy "KNR admins can read order status history"
+  on public.order_status_history for select to authenticated
+  using (exists (select 1 from public.admin_users where user_id=auth.uid()));
+
+create or replace function public.log_order_status_change()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $
+begin
+  if TG_OP = 'INSERT' then
+    insert into public.order_status_history(order_id,old_status,new_status,changed_by)
+    values (NEW.id,null,NEW.status,auth.uid());
+  elsif OLD.status is distinct from NEW.status then
+    insert into public.order_status_history(order_id,old_status,new_status,changed_by)
+    values (NEW.id,OLD.status,NEW.status,auth.uid());
+  end if;
+  return NEW;
+end;
+$;
+
+drop trigger if exists orders_status_history on public.orders;
+create trigger orders_status_history
+  after insert or update of status on public.orders
+  for each row execute function public.log_order_status_change();
+
 create or replace function public.place_order(p_customer jsonb, p_items jsonb)
 returns uuid
 language plpgsql
