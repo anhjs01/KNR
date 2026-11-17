@@ -276,3 +276,51 @@ footer{gap:20px}footer .logo{margin-right:auto}
  .sort-control select{max-width:125px;font-size:10px}
  .catalog-controls .filter-button{white-space:nowrap}
 }
+
+
+/* Acabado editorial para portada y colección */
+.hero{align-items:stretch}
+.hero-copy{animation:knr-rise .65s both}
+.hero-visual{min-height:clamp(420px,42vw,590px);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.hero-image{will-change:transform}
+.hero-visual:before{content:'';position:absolute;z-index:1;inset:0;background:linear-gradient(115deg,#0003 0%,transparent 42%,#0002 100%);pointer-events:none}
+.hero-stamp{z-index:2}
+.hero-caption{z-index:2}
+.hero-foot{width:100%;max-width:380px}
+.hero-foot-line{flex:1}
+.hero-buttons .btn-primary{min-height:48px}
+.btn-text{min-height:44px;transition:color .2s,gap .2s}
+.btn-text:hover{color:var(--accent);gap:14px}
+.ticker{position:relative}
+.ticker div{display:inline-block;min-width:max-content}
+.product-card{position:relative}
+.product-image{outline-offset:4px}
+.product-image:focus-visible,.quick-add:focus-visible,.filter:focus-visible,.filter-button:focus-visible,.sort-control select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.product-image img{display:block}
+.product-image:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 65%,#0002);pointer-events:none}
+.product-meta h3{transition:color .2s}
+.product-card:hover .product-meta h3{color:var(--accent)}
+.quick-add{transition:background .2s,border-color .2s,color .2s,transform .2s}
+.quick-add:not(:disabled):hover{background:var(--accent);border-color:var(--accent);color:#111;transform:translateY(-2px)}
+.catalog-status{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:-12px 0 24px;padding:11px 0;border-bottom:1px solid var(--line);font-size:8px;letter-spacing:1.3px;color:var(--muted)}
+.catalog-status span:first-child{color:var(--text);font-weight:700}
+.combo-image{background-position:center 42%}
+.values>div{transition:transform .25s}
+.values>div:hover{transform:translateY(-4px)}
+@keyframes knr-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:900px){
+ .hero-visual{min-height:430px}
+}
+@media(max-width:650px){
+ .hero-visual{min-height:390px}
+ .hero-copy:after{bottom:-17px}
+ .catalog-status{margin-top:-8px;font-size:7px;letter-spacing:.8px}
+ .catalog-status span:last-child{text-align:right}
+ .hero-stamp{right:16px;top:16px}
+ .hero-caption{font-size:7px;letter-spacing:1px}
+ .product-image:after{opacity:.45}
+}
+@media(prefers-reduced-motion:reduce){
+ .hero-copy{animation:none}
+ .values>div{transition:none}
+}
