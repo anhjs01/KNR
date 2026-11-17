@@ -201,6 +201,9 @@ declare
   v_total integer := 0;
   v_order_id uuid;
   v_snapshot jsonb := '[]'::jsonb;
+  v_combo_count integer := 0;
+  v_combo_pct integer := 0;
+  v_unit_price integer;
 begin
   if coalesce(trim(p_customer->>'name'),'') = ''
     or coalesce(trim(p_customer->>'phone'),'') = ''
@@ -214,25 +217,61 @@ begin
   if jsonb_array_length(p_items) = 0 then
     raise exception 'El carrito está vacío.';
   end if;
+
+  -- El descuento de combo se determina aquí, nunca a partir de precios enviados por el navegador.
+  select count(distinct value->>'id') into v_combo_count
+  from jsonb_array_elements(p_items)
+  where value->>'is_combo' = 'true';
+
+  if v_combo_count >= 2 and exists (
+    select 1
+    from jsonb_array_elements(p_items) item
+    join public.products p on p.id = (item->>'id')::uuid
+    where item->>'is_combo' = 'true' and p.active = true and p.category = 'Relojes'
+  ) then
+    v_combo_pct := case
+      when v_combo_count >= 4 then 15
+      when v_combo_count = 3 then 10
+      when v_combo_count = 2 then 5
+      else 0
+    end;
+  end if;
+
   for v_item in select value from jsonb_array_elements(p_items)
   loop
     v_qty := (v_item->>'qty')::integer;
-    if v_qty is null or v_qty < 1 or v_qty > 20 then raise exception 'Cantidad de producto no válida.'; end if;
+    if v_qty is null or v_qty < 1 or v_qty > 20 then
+      raise exception 'Cantidad de producto no válida.';
+    end if;
     select * into v_product from public.products
       where id = (v_item->>'id')::uuid and active = true for update;
-    if not found then raise exception 'Uno de los productos ya no está disponible.'; end if;
+    if not found then
+      raise exception 'Uno de los productos ya no está disponible.';
+    end if;
     if v_product.track_inventory and v_product.stock < v_qty then
       raise exception 'Stock insuficiente para: %', v_product.name;
     end if;
-    v_total := v_total + (v_product.price * v_qty);
+
+    v_unit_price := v_product.price;
+    if v_combo_pct > 0 and v_item->>'is_combo' = 'true' then
+      v_unit_price := round(v_product.price * (100 - v_combo_pct) / 100.0)::integer;
+    end if;
+    v_total := v_total + (v_unit_price * v_qty);
     v_snapshot := v_snapshot || jsonb_build_array(jsonb_build_object(
-      'id',v_product.id,'name',v_product.name,'qty',v_qty,'unit_price',v_product.price,
-      'category',v_product.category,'style',v_product.style
+      'id',v_product.id,
+      'name',v_product.name,
+      'qty',v_qty,
+      'unit_price',v_unit_price,
+      'list_price',v_product.price,
+      'combo_discount_pct',case when v_item->>'is_combo' = 'true' then v_combo_pct else 0 end,
+      'category',v_product.category,
+      'style',v_product.style
     ));
     if v_product.track_inventory then
       update public.products set stock = stock - v_qty where id = v_product.id;
     end if;
   end loop;
+
   insert into public.orders(customer_name,customer_phone,neighborhood,delivery_address,delivery_details,receiver,items,total)
   values(trim(p_customer->>'name'),trim(p_customer->>'phone'),trim(p_customer->>'neighborhood'),
     trim(p_customer->>'address'),coalesce(p_customer->>'details',''),
