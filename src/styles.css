@@ -425,3 +425,24 @@ main#inicio{scroll-margin-top:82px}
  .cart-total .grand-total strong{font-size:17px}
 }
 @media(prefers-reduced-motion:reduce){.qty button{transition:none}}
+
+
+/* Checkout: lectura clara del pedido y datos de entrega */
+.checkout-review-saving{font-variant-numeric:tabular-nums}
+.checkout-review-saving strong{font-weight:800}
+.checkout-review-saving:first-of-type strong{color:var(--text)}
+.checkout-review-saving+.checkout-review-saving strong{color:#79b98d}
+.checkout-fields label{font-weight:600;letter-spacing:.15px}
+.checkout-fields input{border-radius:0;transition:border-color .18s,background .18s}
+.checkout-fields input:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-color:var(--accent)}
+.checkout-fields input::placeholder{color:var(--muted);opacity:.7}
+.checkout-modal .privacy-note{border-left:2px solid var(--accent)}
+.checkout-modal .checkout-total strong{font-variant-numeric:tabular-nums}
+.checkout-modal button[type=submit]:focus-visible{outline:2px solid var(--text);outline-offset:3px}
+@media(max-width:600px){
+ .checkout-modal{scroll-padding-bottom:90px}
+ .checkout-review-line>div strong{font-size:12px}
+ .checkout-review-line>b{font-size:12px}
+ .checkout-modal .privacy-note{margin:12px 0}
+}
+@media(prefers-reduced-motion:reduce){.checkout-fields input{transition:none}}
