@@ -593,3 +593,88 @@ revoke all on function public.admin_order_report(text,timestamptz,timestamptz) f
 grant execute on function public.admin_order_report(text,timestamptz,timestamptz) to authenticated;
 
 
+
+
+-- Proveedores y órdenes de compra: privados para administradores.
+create table if not exists public.suppliers (
+ id uuid primary key default gen_random_uuid(),
+ name text not null,
+ contact_name text not null default '',
+ phone text not null default '',
+ email text not null default '',
+ notes text not null default '',
+ created_at timestamptz not null default now()
+);
+create table if not exists public.purchase_orders (
+ id uuid primary key default gen_random_uuid(),
+ supplier_id uuid not null references public.suppliers(id) on delete restrict,
+ status text not null default 'pending' check(status in ('pending','received','cancelled')),
+ notes text not null default '',
+ total_amount bigint not null default 0 check(total_amount>=0),
+ created_at timestamptz not null default now(),
+ received_at timestamptz
+);
+create table if not exists public.purchase_order_items (
+ id uuid primary key default gen_random_uuid(),
+ purchase_order_id uuid not null references public.purchase_orders(id) on delete cascade,
+ product_id uuid not null references public.products(id) on delete restrict,
+ quantity integer not null check(quantity>0),
+ unit_cost integer not null check(unit_cost>=0),
+ line_total bigint generated always as (quantity::bigint*unit_cost::bigint) stored
+);
+alter table public.suppliers enable row level security;
+alter table public.purchase_orders enable row level security;
+alter table public.purchase_order_items enable row level security;
+grant select,insert,update,delete on public.suppliers,public.purchase_orders,public.purchase_order_items to authenticated;
+drop policy if exists "KNR admins manage suppliers" on public.suppliers;
+create policy "KNR admins manage suppliers" on public.suppliers for all to authenticated
+using(exists(select 1 from public.admin_users where user_id=auth.uid()))
+with check(exists(select 1 from public.admin_users where user_id=auth.uid()));
+drop policy if exists "KNR admins manage purchase orders" on public.purchase_orders;
+create policy "KNR admins manage purchase orders" on public.purchase_orders for all to authenticated
+using(exists(select 1 from public.admin_users where user_id=auth.uid()))
+with check(exists(select 1 from public.admin_users where user_id=auth.uid()));
+drop policy if exists "KNR admins manage purchase items" on public.purchase_order_items;
+create policy "KNR admins manage purchase items" on public.purchase_order_items for all to authenticated
+using(exists(select 1 from public.admin_users where user_id=auth.uid()))
+with check(exists(select 1 from public.admin_users where user_id=auth.uid()));
+
+create or replace function public.create_purchase_order(p_supplier_id uuid,p_notes text,p_items jsonb)
+returns uuid language plpgsql security definer set search_path=public as $$
+declare v_order_id uuid; v_item jsonb; v_product_id uuid; v_qty integer; v_cost integer; v_total bigint:=0;
+begin
+ if not exists(select 1 from public.admin_users where user_id=auth.uid()) then raise exception 'No autorizado.'; end if;
+ if not exists(select 1 from public.suppliers where id=p_supplier_id) then raise exception 'Proveedor no válido.'; end if;
+ if jsonb_typeof(p_items)<>'array' or jsonb_array_length(p_items)=0 then raise exception 'Agrega al menos un producto.'; end if;
+ insert into public.purchase_orders(supplier_id,notes) values(p_supplier_id,coalesce(p_notes,'')) returning id into v_order_id;
+ for v_item in select value from jsonb_array_elements(p_items) loop
+  v_product_id:=(v_item->>'product_id')::uuid; v_qty:=(v_item->>'quantity')::integer; v_cost:=(v_item->>'unit_cost')::integer;
+  if v_qty<1 or v_cost<0 then raise exception 'Cantidad o costo no válido.'; end if;
+  if not exists(select 1 from public.products where id=v_product_id) then raise exception 'Producto no encontrado.'; end if;
+  insert into public.purchase_order_items(purchase_order_id,product_id,quantity,unit_cost) values(v_order_id,v_product_id,v_qty,v_cost);
+  v_total:=v_total+v_qty::bigint*v_cost::bigint;
+ end loop;
+ update public.purchase_orders set total_amount=v_total where id=v_order_id;
+ return v_order_id;
+end; $$;
+
+create or replace function public.receive_purchase_order(p_order_id uuid)
+returns void language plpgsql security definer set search_path=public as $$
+declare v_order public.purchase_orders%rowtype; v_item record;
+begin
+ if not exists(select 1 from public.admin_users where user_id=auth.uid()) then raise exception 'No autorizado.'; end if;
+ select * into v_order from public.purchase_orders where id=p_order_id for update;
+ if not found then raise exception 'Orden no encontrada.'; end if;
+ if v_order.status<>'pending' then raise exception 'Esta orden ya fue procesada.'; end if;
+ for v_item in select product_id,quantity,unit_cost from public.purchase_order_items where purchase_order_id=p_order_id loop
+  update public.products set stock=coalesce(stock,0)+v_item.quantity where id=v_item.product_id and track_inventory=true;
+  if not found then raise exception 'El producto no tiene control de inventario o ya no existe.'; end if;
+  insert into public.product_costs(product_id,cost_price,updated_at)
+  values(v_item.product_id,v_item.unit_cost,now())
+  on conflict(product_id) do update set cost_price=excluded.cost_price,updated_at=now();
+ end loop;
+ update public.purchase_orders set status='received',received_at=now() where id=p_order_id;
+end; $$;
+grant execute on function public.create_purchase_order(uuid,text,jsonb) to authenticated;
+grant execute on function public.receive_purchase_order(uuid) to authenticated;
+
