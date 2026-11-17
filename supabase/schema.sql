@@ -391,6 +391,7 @@ begin
     select
       coalesce(item.value->>'id', item.value->>'name') as product_id,
       coalesce(item.value->>'name','Producto') as product_name,
+      coalesce(item.value->>'category','Sin categoría') as category,
       coalesce((item.value->>'qty')::integer,0) as qty,
       coalesce((item.value->>'unit_price')::numeric,0) as unit_price,
       coalesce((item.value->>'unit_cost')::numeric,0) as unit_cost
@@ -407,6 +408,28 @@ begin
     from product_lines
     group by product_id, product_name
     order by sum(qty * (unit_price-unit_cost)) desc, sum(qty * unit_price) desc
+    limit 5
+  ),
+  category_ranking as (
+    select coalesce(item.value->>'category','Sin categoría') as category,
+      sum(coalesce((item.value->>'qty')::integer,0))::integer as qty,
+      sum(coalesce((item.value->>'qty')::numeric,0)*coalesce((item.value->>'unit_price')::numeric,0))::numeric as revenue,
+      sum(coalesce((item.value->>'qty')::numeric,0)*coalesce((item.value->>'unit_cost')::numeric,0))::numeric as cost,
+      sum(coalesce((item.value->>'qty')::numeric,0)*(coalesce((item.value->>'unit_price')::numeric,0)-coalesce((item.value->>'unit_cost')::numeric,0)))::numeric as profit
+    from filtered f
+    cross join lateral jsonb_array_elements(f.items) as item(value)
+    where f.status='delivered'
+    group by coalesce(item.value->>'category','Sin categoría')
+  ),
+  bottom_ranking as (
+    select product_id,product_name,sum(qty)::integer as qty,
+      sum(qty*unit_price)::numeric as revenue,
+      sum(qty*unit_cost)::numeric as cost,
+      sum(qty*(unit_price-unit_cost))::numeric as profit
+    from product_lines
+    group by product_id,product_name
+    having sum(qty)>0
+    order by sum(qty*(unit_price-unit_cost)) asc,sum(qty*unit_price) asc
     limit 5
   ),
   months as (
@@ -451,6 +474,14 @@ begin
     'top_products',coalesce((select jsonb_agg(jsonb_build_object(
       'id',product_id,'name',product_name,'qty',qty,'revenue',revenue,'cost',cost,'profit',profit
     ) order by profit desc,revenue desc) from ranking),'[]'::jsonb),
+    'category_performance',coalesce((select jsonb_agg(jsonb_build_object(
+      'category',category,'qty',qty,'revenue',revenue,'cost',cost,'profit',profit,
+      'margin_pct',case when revenue>0 then round(profit/revenue*100,1) else 0 end
+    ) order by revenue desc) from category_ranking),'[]'::jsonb),
+    'bottom_products',coalesce((select jsonb_agg(jsonb_build_object(
+      'id',product_id,'name',product_name,'qty',qty,'revenue',revenue,'cost',cost,'profit',profit,
+      'margin_pct',case when revenue>0 then round(profit/revenue*100,1) else 0 end
+    ) order by profit asc,revenue asc) from bottom_ranking),'[]'::jsonb),
     'monthly_sales',coalesce((
       select jsonb_agg(jsonb_build_object(
         'month',to_char(m.month_start,'YYYY-MM'),
