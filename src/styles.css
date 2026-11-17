@@ -465,3 +465,25 @@ main#inicio{scroll-margin-top:82px}
  html{scroll-behavior:auto}
  .menu-toggle{transition:none}
 }
+
+
+/* Lenguaje visual Luxury: tratamiento editorial sin alterar el catálogo */
+.app,.app .header,.app .ticker,.app footer,.app .product-image,.app .combo-copy,.app .sound-pill{
+ transition:background-color .35s ease,color .35s ease,border-color .35s ease;
+}
+.luxury .product-image{background:#dedbd3}
+.luxury .product-image img{filter:saturate(.48) contrast(1.04)}
+.luxury .product-card .product-meta h3{letter-spacing:-.25px}
+.luxury .product-image .quick-view{background:#9b7846;color:#fff}
+.luxury .combo-image{filter:grayscale(.82) contrast(1.08)}
+.luxury .ticker{background:#dedbd3}
+.luxury .values>div{border-left-color:var(--line)}
+.luxury .sound-pill{box-shadow:0 8px 28px #0000000d}
+.app:not(.luxury) .product-image img{filter:saturate(.82) contrast(1.02)}
+.app:not(.luxury) .combo-image{filter:grayscale(.35) contrast(1.04)}
+@media(hover:hover){
+ .luxury .product-image:hover img{filter:saturate(.68) contrast(1.05)}
+}
+@media(prefers-reduced-motion:reduce){
+ .app,.app .header,.app .ticker,.app footer,.app .product-image,.app .combo-copy,.app .sound-pill{transition:none}
+}
