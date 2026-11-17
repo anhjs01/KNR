@@ -381,7 +381,51 @@ begin
     raise exception 'No autorizado para consultar reportes.';
   end if;
 
-  with filtered as (
+  with comparison_bounds as (
+    select
+      coalesce(p_from::date,date_trunc('month',current_date)::date) as start_date,
+      greatest(coalesce(p_from::date,date_trunc('month',current_date)::date),
+        coalesce(p_to::date,current_date)) as end_date
+  ),
+  comparison_current as (
+    select
+      count(*)::integer as orders,
+      count(*) filter (where o.status='delivered')::integer as delivered_orders,
+      coalesce(sum(o.total) filter (where o.status='delivered'),0)::numeric as revenue,
+      coalesce(sum((item.value->>'qty')::numeric*coalesce((item.value->>'unit_cost')::numeric,0))
+        filter (where o.status='delivered'),0)::numeric as cost,
+      coalesce(sum((item.value->>'qty')::numeric*((item.value->>'unit_price')::numeric-coalesce((item.value->>'unit_cost')::numeric,0)))
+        filter (where o.status='delivered'),0)::numeric as profit
+    from public.orders o
+    cross join comparison_bounds b
+    left join lateral jsonb_array_elements(o.items) item(value) on true
+    where o.created_at >= b.start_date
+      and o.created_at < b.end_date + interval '1 day'
+      and (p_status is null or o.status=p_status)
+  ),
+  comparison_previous as (
+    select
+      count(*)::integer as orders,
+      count(*) filter (where o.status='delivered')::integer as delivered_orders,
+      coalesce(sum(o.total) filter (where o.status='delivered'),0)::numeric as revenue,
+      coalesce(sum((item.value->>'qty')::numeric*coalesce((item.value->>'unit_cost')::numeric,0))
+        filter (where o.status='delivered'),0)::numeric as cost,
+      coalesce(sum((item.value->>'qty')::numeric*((item.value->>'unit_price')::numeric-coalesce((item.value->>'unit_cost')::numeric,0)))
+        filter (where o.status='delivered'),0)::numeric as profit
+    from public.orders o
+    cross join comparison_bounds b
+    left join lateral jsonb_array_elements(o.items) item(value) on true
+    where o.created_at >= b.start_date - (b.end_date-b.start_date+1)
+      and o.created_at < b.start_date
+      and (p_status is null or o.status=p_status)
+  ),
+  comparison_expenses as (
+    select
+      coalesce(sum(e.amount) filter (where e.incurred_on between b.start_date and b.end_date),0)::numeric as current_expenses,
+      coalesce(sum(e.amount) filter (where e.incurred_on >= b.start_date-(b.end_date-b.start_date+1) and e.incurred_on < b.start_date),0)::numeric as previous_expenses
+    from public.operating_expenses e cross join comparison_bounds b
+  ),
+  filtered as (
     select o.* from public.orders o
     where (p_status is null or o.status = p_status)
       and (p_from is null or o.created_at >= p_from)
@@ -448,6 +492,28 @@ begin
     group by date_trunc('month',f.created_at)::date
   )
   select jsonb_build_object(
+    'period_comparison',(
+      select jsonb_build_object(
+        'start_date',b.start_date,'end_date',b.end_date,
+        'previous_start_date',b.start_date-(b.end_date-b.start_date+1),
+        'previous_end_date',b.start_date-1,
+        'current',jsonb_build_object('orders',c.orders,'delivered_orders',c.delivered_orders,
+          'revenue',c.revenue,'cost',c.cost,'gross_profit',c.profit,
+          'expenses',e.current_expenses,'net_profit',c.profit-e.current_expenses),
+        'previous',jsonb_build_object('orders',p.orders,'delivered_orders',p.delivered_orders,
+          'revenue',p.revenue,'cost',p.cost,'gross_profit',p.profit,
+          'expenses',e.previous_expenses,'net_profit',p.profit-e.previous_expenses),
+        'change_pct',jsonb_build_object(
+          'orders',case when p.orders=0 then null else round((c.orders-p.orders)::numeric/abs(p.orders)*100,1) end,
+          'revenue',case when p.revenue=0 then null else round((c.revenue-p.revenue)/abs(p.revenue)*100,1) end,
+          'gross_profit',case when p.profit=0 then null else round((c.profit-p.profit)/abs(p.profit)*100,1) end,
+          'expenses',case when e.previous_expenses=0 then null else round((e.current_expenses-e.previous_expenses)/abs(e.previous_expenses)*100,1) end,
+          'net_profit',case when p.profit-e.previous_expenses=0 then null else round(((c.profit-e.current_expenses)-(p.profit-e.previous_expenses))/abs(p.profit-e.previous_expenses)*100,1) end
+        )
+      )
+      from comparison_bounds b cross join comparison_current c
+      cross join comparison_previous p cross join comparison_expenses e
+    ),
     'total_orders',(select count(*) from filtered),
     'pending_count',(select count(*) from filtered where status='pending'),
     'delivered_revenue',(select coalesce(sum(total),0) from filtered where status='delivered'),
