@@ -389,8 +389,8 @@ begin
   ),
   comparison_current as (
     select
-      count(*)::integer as orders,
-      count(*) filter (where o.status='delivered')::integer as delivered_orders,
+      count(distinct o.id)::integer as orders,
+      count(distinct o.id) filter (where o.status='delivered')::integer as delivered_orders,
       coalesce(sum(o.total) filter (where o.status='delivered'),0)::numeric as revenue,
       coalesce(sum((item.value->>'qty')::numeric*coalesce((item.value->>'unit_cost')::numeric,0))
         filter (where o.status='delivered'),0)::numeric as cost,
