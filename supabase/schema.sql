@@ -167,7 +167,7 @@ create table if not exists public.product_costs (
   updated_at timestamptz not null default now()
 );
 -- Conserva los costos que pudieran haberse guardado en una versión anterior.
-do $
+do $migrate$
 begin
   if exists (
     select 1 from information_schema.columns
@@ -178,7 +178,7 @@ begin
       on conflict(product_id) do update set cost_price=excluded.cost_price';
     alter table public.products drop column cost_price;
   end if;
-end $;
+end $migrate$;
 alter table public.product_costs enable row level security;
 grant select, insert, update, delete on public.product_costs to authenticated;
 drop policy if exists "KNR admins manage product costs" on public.product_costs;
