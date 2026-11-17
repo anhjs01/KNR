@@ -102,3 +102,14 @@
  .admin-bottom-products .top-product-list>div{grid-template-columns:26px 1fr;gap:7px}
  .admin-bottom-products .top-product-list>div>span:not(.top-product-rank),.admin-bottom-products .top-product-list>div>strong{grid-column:2}
 }
+
+
+.admin-period-comparison{margin:22px 0;padding:24px;border:1px solid var(--admin-line,#dedbd5);border-radius:18px;background:var(--admin-panel,#fff)}
+.period-comparison-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;margin-top:18px}
+.period-comparison-grid article{display:flex;flex-direction:column;gap:8px;min-width:0;padding:16px;border:1px solid var(--admin-line,#e5e1da);border-radius:13px;background:var(--admin-card,#faf9f7)}
+.period-comparison-grid article>span{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--admin-muted,#777)}
+.period-comparison-grid article>strong{font-size:clamp(19px,2vw,25px);overflow-wrap:anywhere}
+.period-comparison-grid article>small{font-size:12px;color:var(--admin-muted,#777)}
+.period-comparison-grid article>b{font-size:13px}
+.period-comparison-grid article>b i{font-size:11px;font-style:normal;font-weight:400;color:var(--admin-muted,#777)}
+@media(max-width:680px){.admin-period-comparison{padding:16px;margin:16px 0}.period-comparison-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.period-comparison-grid article{padding:12px}}
