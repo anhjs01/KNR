@@ -240,7 +240,7 @@ returns trigger
 language plpgsql
 security definer
 set search_path = public
-as $
+as $$
 begin
   if TG_OP = 'INSERT' then
     insert into public.order_status_history(order_id,old_status,new_status,changed_by)
