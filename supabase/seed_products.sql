@@ -1,10 +1,10 @@
 -- Catálogo inicial de demostración KNR.
--- Ejecutar una sola vez en Supabase > SQL Editor.
--- Solo inserta los productos si la tabla está vacía; luego se administran desde /admin.
+-- Ejecutar en Supabase > SQL Editor después de fix_product_permissions.sql.
+-- Recupera el catálogo de muestra si todavía no existe ninguno de estos productos.
 
 do $seed$
 begin
-  if not exists (select 1 from public.products) then
+  if not exists (select 1 from public.products where name in ('Noir Chronograph','Steel Horizon','Midnight Sport','Classic Gold','Urban Frame','KNR Essential Cap','KNR Street Cap','KNR Classic Cap','Scent No. 08')) then
     insert into public.products
       (name, category, style, price, old_price, discount, tag, description, specs, image_urls, video_url, stock, track_inventory, reorder_level, reorder_quantity, active)
     values
