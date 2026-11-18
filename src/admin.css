@@ -134,3 +134,37 @@
 .image-preview-item button{position:absolute;top:5px;right:5px;width:24px;height:24px;border:1px solid #777;border-radius:50%;background:#111;color:#fff;font-size:17px;line-height:1;cursor:pointer}
 .image-preview-item small{font-size:10px;color:#c6a36a;text-align:center}
 @media(max-width:560px){.admin-heading-actions{width:100%}.admin-heading-actions button{flex:1}.image-preview{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+
+/* KNR dark report surfaces: keep analytics readable in the night theme. */
+.admin-category-report,.admin-bottom-products,.admin-period-comparison,.admin-inventory-forecast{
+ background:#1b1b1b!important;border-color:#383838!important;color:#f1eee8!important;
+}
+.category-report-grid article,.period-comparison-grid article,.inventory-forecast-list article{
+ background:#242424!important;border-color:#414141!important;color:#f1eee8!important;
+}
+.category-report-grid article>span,.period-comparison-grid article>span,
+.period-comparison-grid article>small,.period-comparison-grid article>b i,
+.inventory-forecast-list small,.admin-category-report .admin-muted,
+.admin-bottom-products .admin-muted,.admin-period-comparison .admin-muted,
+.admin-inventory-forecast .admin-muted{color:#b8b5ad!important}
+.category-report-grid article>strong,.category-report-grid article>div,
+.category-report-grid article>div b,.period-comparison-grid article>strong,
+.period-comparison-grid article>b,.inventory-forecast-list strong{color:#f0eee8}
+.category-profit-track{background:#3a3935!important}
+.admin-bottom-products .top-product-list>div{background:#252525!important;border-color:#414141!important;color:#eee}
+.admin-bottom-products .top-product-list>div span:not(.top-product-rank){color:#c4c0b7}
+.catalog-filters input,.catalog-filters select{background:#242424!important;border-color:#444!important;color:#f2f0eb!important}
+.product-live-preview{margin:18px 0;padding:16px;background:#151515;border:1px solid #484033}
+.product-live-preview-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px;color:#e7d2ad;font-size:11px}
+.product-live-preview-head a{color:#d8b77e;text-decoration:none}
+.product-live-preview-card{display:grid;grid-template-columns:104px minmax(0,1fr);gap:14px;align-items:start}
+.product-live-preview-card>img,.product-live-preview-placeholder{width:104px;height:120px;object-fit:cover;background:#292929}
+.product-live-preview-placeholder{display:grid;place-items:center;color:#c6a36a;font:800 20px Manrope}
+.product-live-preview-card>div:last-child{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
+.product-live-preview-card small{font-size:9px;color:#c6a36a;letter-spacing:.08em}
+.product-live-preview-card b{font:700 14px Manrope;color:#f5f2ec}
+.product-live-preview-card strong{font-size:17px;color:#e1c18d}
+.product-live-preview-card del{font-size:11px;color:#999}
+.product-live-preview-card p{font-size:11px;line-height:1.5;color:#aaa;margin:3px 0}
+@media(max-width:420px){.product-live-preview-card{grid-template-columns:78px minmax(0,1fr)}.product-live-preview-card>img,.product-live-preview-placeholder{width:78px;height:100px}}
