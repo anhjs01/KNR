@@ -18,6 +18,7 @@ create table if not exists public.products (
   price integer not null check (price >= 0),
   old_price integer check (old_price is null or old_price >= 0),
   discount integer not null default 0 check (discount between 0 and 90),
+  is_offer boolean not null default false,
   tag text not null default 'NUEVO',
   description text not null default '',
   specs jsonb not null default '[]'::jsonb,
