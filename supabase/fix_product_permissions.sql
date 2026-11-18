@@ -9,6 +9,20 @@ grant select on public.products to anon, authenticated;
 grant insert, update, delete on public.products to authenticated;
 grant select, insert, update, delete on storage.objects to authenticated;
 
+-- Permisos explícitos para música y banners, incluso si una instalación antigua
+-- dejó creada la tabla de música en singular.
+do $grants$
+declare t text;
+begin
+ foreach t in array array['music_tracks','music_track','store_banners','stores_banners'] loop
+  if to_regclass('public.'||t) is not null then
+   execute format('grant select on table public.%I to anon, authenticated',t);
+   execute format('grant insert, update, delete on table public.%I to authenticated',t);
+  end if;
+ end loop;
+end;
+$grants$;
+
 -- Permisos para las tablas de contenido. Se contemplan ambos nombres por si
 -- una instalación anterior creó las tablas en singular/plural.
 do $permissions$
