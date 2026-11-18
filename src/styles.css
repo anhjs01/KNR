@@ -698,3 +698,22 @@ main#inicio{scroll-margin-top:82px}
  .hero-buttons .btn-text svg{transition:none}
  .hero-buttons .btn-text:hover svg{transform:none}
 }
+
+
+/* Carrito vacío: sugerencias rápidas sin abandonar el flujo */
+.empty-cart{width:100%;max-width:360px;padding:25px 0;overflow:auto}
+.empty-cart>svg{color:var(--accent);stroke-width:1.2}
+.empty-cart>p{max-width:28ch;margin:0 auto 22px;line-height:1.7}
+.empty-cart-picks{margin:24px 0 16px;text-align:left;border-top:1px solid var(--line)}
+.empty-cart-label{display:block;padding:13px 0 8px;color:var(--muted);font-size:8px;font-weight:800;letter-spacing:1.5px}
+.empty-cart-pick{display:grid;grid-template-columns:48px minmax(0,1fr) 34px;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--line);text-align:left}
+.empty-cart-pick img{width:48px;height:54px;object-fit:cover;background:var(--bg)}
+.empty-cart-pick>div{display:flex;min-width:0;flex-direction:column;gap:5px}
+.empty-cart-pick strong{font:700 11px Manrope;color:var(--text);overflow-wrap:anywhere}
+.empty-cart-pick small{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+.empty-cart-pick button{width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--line);background:transparent;color:var(--text)}
+.empty-cart-pick button:hover{background:var(--accent);border-color:var(--accent);color:#111}
+.empty-cart-pick button:focus-visible,.empty-cart-browse:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.empty-cart-browse{margin:5px auto 0;padding:10px 0;color:var(--accent);font-size:9px;font-weight:800;letter-spacing:1px}
+.empty-cart-browse:hover{color:var(--text)}
+@media(max-width:520px){.empty-cart{max-width:100%;padding:18px 0}.empty-cart-picks{margin-top:19px}.empty-cart-pick{grid-template-columns:44px minmax(0,1fr) 34px}.empty-cart-pick img{width:44px;height:50px}}
