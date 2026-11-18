@@ -71,7 +71,8 @@ La clave usada en el frontend debe ser la clave pública de Supabase. Nunca colo
 - El pedido queda registrado con estado `pending` antes de abrir WhatsApp. WhatsApp no confirma pagos ni entregas: el equipo debe actualizar manualmente el estado desde `/admin`. Si se cancela antes del despacho, el inventario reservado se devuelve automáticamente; los pedidos enviados o entregados requieren gestión de devolución.
 - Añade aviso de privacidad y define el tratamiento de datos personales conforme a la normativa colombiana antes de operar.
 - Prueba la aplicación en un entorno de despliegue y configura las variables de entorno en el proveedor de hosting.
-\n\n- Reportes históricos mediante `admin_order_report`: conteo total, pedidos pendientes, ventas entregadas y top 5 productos calculados en PostgreSQL sobre todos los pedidos que coinciden con los filtros, sin depender de la página visible. Tras actualizar `supabase/schema.sql`, ejecutar el archivo completo en Supabase SQL Editor para habilitar la función.\n
+
+
 
 ### Previsión y reposición de inventario
 
@@ -100,3 +101,10 @@ En `/admin`, cada producto con control de inventario permite configurar un punto
 - Antes de compartir los datos, el checkout muestra los artículos, cantidades, subtotales y ahorro aplicado.
 - Los campos de contacto y dirección usan atributos de autocompletado y el teléfono tiene validación básica de formato/longitud.
 - El costo de envío permanece por confirmar; no se suma un valor de envío inventado.
+
+
+### Refinamientos de experiencia de compra
+- Los diálogos principales se pueden cerrar con Escape; si hay varias capas abiertas, se cierra primero la superior.
+- Los controles de galería y cierre muestran foco visible para navegación por teclado.
+- El carrito refleja la disponibilidad del catálogo cargado y bloquea el incremento al alcanzar el stock conocido.
+- El pie de página ofrece accesos rápidos a Inicio, Colección y Combos, con distribución responsive.
