@@ -148,7 +148,7 @@ export default function Admin(){
    const savedProduct={...result.data,shipping_cost:Math.max(0,Math.round(Number(form.shipping_cost)||0))};
    setItems(current=>editing?current.map(item=>item.id===productId?savedProduct:item):[savedProduct,...current]);
    setForm(blank);setFiles([]);setEditing(null);
-   setNotice(costError?'Producto guardado y añadido al catálogo. No se pudo guardar el costo privado: '+costError.message:(editing?'Cambios guardados correctamente.':'¡Producto guardado en Supabase y añadido al catálogo!'));
+   setNotice(costError?'Producto guardado y añadido al catálogo. No se pudo guardar el costo de envío: '+costError.message:(editing?'Cambios guardados correctamente.':'¡Producto guardado en Supabase y añadido al catálogo!'));
    document.getElementById('product-editor')?.scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){setError(e.message||'No se pudo guardar el producto. Revisa la conexión y los permisos de Supabase.')}
   finally{setSavingProduct(false)}
