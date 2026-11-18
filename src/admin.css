@@ -175,3 +175,5 @@
 #delivery-settings-panel .expense-form label{color:#e5e0d7}
 #delivery-settings-panel input{background:#171717;color:#f1eee8;border-color:#45413a}
 #delivery-settings-panel .admin-muted{color:#b9b4aa}
+
+.order-priority-flag{display:inline-flex;align-items:center;margin-top:7px;padding:5px 8px;border:1px solid #c99a55;border-radius:4px;background:rgba(201,154,85,.12);color:#e6bd7e;font-size:9px;font-weight:800;letter-spacing:.08em}
