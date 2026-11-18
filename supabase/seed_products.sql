@@ -51,6 +51,20 @@ begin
         null, 0, false, 5, 10, true
       ),
       (
+        'KNR Street Cap', 'Gorras', 'urban', 74000, null, 0, 'URBAN',
+        'Gorra de perfil urbano para completar un look casual de todos los días.',
+        '["Visera curva","Ajuste posterior","Diseño urbano"]'::jsonb,
+        '["https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=1000&q=85"]'::jsonb,
+        null, 0, false, 5, 10, true
+      ),
+      (
+        'KNR Classic Cap', 'Gorras', 'luxury', 79000, null, 0, 'CLÁSICA',
+        'Una silueta sencilla y versátil, pensada para combinar con prendas básicas.',
+        '["Perfil clásico","Correa ajustable","Estilo unisex"]'::jsonb,
+        '["https://images.unsplash.com/photo-1534215754734-18e55d13e346?auto=format&fit=crop&w=1000&q=85"]'::jsonb,
+        null, 0, false, 5, 10, true
+      ),
+      (
         'Scent No. 08', 'Perfumería', 'luxury', 139000, null, 0, 'AROMA',
         'Una propuesta olfativa cálida y envolvente. Consulta las notas y concentración antes de elegir.',
         '["Familia aromática: amaderada*","Presentación de referencia","Verifica contenido y autenticidad"]'::jsonb,
