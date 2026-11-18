@@ -252,7 +252,6 @@ begin
   return NEW;
 end;
 $;
-
 drop trigger if exists orders_status_history on public.orders;
 create trigger orders_status_history
   after insert or update of status on public.orders
