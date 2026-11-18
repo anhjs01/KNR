@@ -55,6 +55,13 @@ for delete to authenticated using (
   exists (select 1 from public.admin_users where user_id = auth.uid())
 );
 
+-- Permisos SQL explícitos; RLS sigue controlando qué filas puede modificar cada rol.
+grant select on public.admin_users to authenticated;
+grant select on public.products to anon, authenticated;
+grant insert, update, delete on public.products to authenticated;
+grant select on storage.objects to anon, authenticated;
+grant insert, update, delete on storage.objects to authenticated;
+
 insert into storage.buckets (id,name,public,file_size_limit,allowed_mime_types)
 values ('product-media','product-media',true,10485760,array['image/jpeg','image/png','image/webp','image/avif'])
 on conflict (id) do nothing;
