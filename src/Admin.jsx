@@ -95,14 +95,14 @@ export default function Admin(){
     if(batch.length<pageSize)break;
     offset+=pageSize;
    }
-   const columns=['Pedido','Fecha','Estado','Cliente','Teléfono','Barrio','Dirección','Detalles','Recibe','Productos','Total COP'];
+   const columns=['Pedido','Fecha','Estado','Cliente','Teléfono','Barrio','Dirección','Detalles','Recibe','Entrega solicitada','Horario de entrega','Prioritaria','Envío COP','Recargo prioritario COP','Productos','Total COP'];
    const quote=value=>{
     const safe=String(value??'').replace(/^[=+@-]/,"'$&");
     return '"'+safe.replace(/"/g,'""')+'"';
    };
    const rows=all.map(o=>[
     o.id,new Date(o.created_at).toLocaleString('es-CO'),o.status,o.customer_name,o.customer_phone,o.neighborhood,
-    o.delivery_address,o.delivery_details,o.receiver,
+    o.delivery_address,o.delivery_details,o.receiver,o.delivery_date||'',o.delivery_window||'',o.delivery_priority?'Sí':'No',o.shipping_cost||0,o.priority_fee||0,
     (o.items||[]).map(it=>it.qty+' x '+it.name+' ('+money(it.unit_price)+')').join(' | '),o.total
    ]);
    const csv='\uFEFF'+[columns,...rows].map(row=>row.map(quote).join(';')).join('\r\n');
