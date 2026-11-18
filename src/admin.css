@@ -168,3 +168,10 @@
 .product-live-preview-card del{font-size:11px;color:#999}
 .product-live-preview-card p{font-size:11px;line-height:1.5;color:#aaa;margin:3px 0}
 @media(max-width:420px){.product-live-preview-card{grid-template-columns:78px minmax(0,1fr)}.product-live-preview-card>img,.product-live-preview-placeholder{width:78px;height:100px}}
+
+#delivery-settings-panel{scroll-margin-top:24px}
+#delivery-settings-panel h3{margin:20px 0 6px;color:#e4c58f;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+#delivery-settings-panel .expense-form{padding:18px;background:#202020;border:1px solid #3d3a34;border-radius:14px}
+#delivery-settings-panel .expense-form label{color:#e5e0d7}
+#delivery-settings-panel input{background:#171717;color:#f1eee8;border-color:#45413a}
+#delivery-settings-panel .admin-muted{color:#b9b4aa}
