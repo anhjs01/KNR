@@ -48,3 +48,73 @@ drop policy if exists "Admins can read their own membership" on public.admin_use
 create policy "Admins can read their own membership" on public.admin_users
 for select to authenticated
 using (user_id = auth.uid());
+
+
+-- Visibilidad pública del catálogo KNR.
+-- Los productos y banners activos se muestran a cualquier visitante, sin iniciar sesión.
+-- Las altas, ediciones y eliminaciones siguen reservadas a cuentas administradoras.
+grant usage on schema public to anon, authenticated;
+grant select on public.products to anon, authenticated;
+grant select on public.store_banners to anon, authenticated;
+grant select on storage.objects to anon, authenticated;
+grant insert, update, delete on public.products to authenticated;
+grant insert, update, delete on public.store_banners to authenticated;
+grant insert, update, delete on storage.objects to authenticated;
+
+alter table public.products enable row level security;
+drop policy if exists "Public can view active KNR products" on public.products;
+create policy "Public can view active KNR products" on public.products
+for select to anon, authenticated
+using (active = true or exists (
+  select 1 from public.admin_users where user_id = auth.uid()
+));
+
+drop policy if exists "KNR admins can insert products" on public.products;
+create policy "KNR admins can insert products" on public.products
+for insert to authenticated with check (
+  exists (select 1 from public.admin_users where user_id = auth.uid())
+);
+drop policy if exists "KNR admins can update products" on public.products;
+create policy "KNR admins can update products" on public.products
+for update to authenticated using (
+  exists (select 1 from public.admin_users where user_id = auth.uid())
+) with check (
+  exists (select 1 from public.admin_users where user_id = auth.uid())
+);
+drop policy if exists "KNR admins can delete products" on public.products;
+create policy "KNR admins can delete products" on public.products
+for delete to authenticated using (
+  exists (select 1 from public.admin_users where user_id = auth.uid())
+);
+
+alter table public.store_banners enable row level security;
+drop policy if exists "Public can view active KNR banners" on public.store_banners;
+create policy "Public can view active KNR banners" on public.store_banners
+for select to anon, authenticated using (active = true or exists (
+  select 1 from public.admin_users where user_id = auth.uid()
+));
+drop policy if exists "KNR admins can insert banners" on public.store_banners;
+create policy "KNR admins can insert banners" on public.store_banners
+for insert to authenticated with check (exists (
+  select 1 from public.admin_users where user_id = auth.uid()
+));
+drop policy if exists "KNR admins can update banners" on public.store_banners;
+create policy "KNR admins can update banners" on public.store_banners
+for update to authenticated using (exists (
+  select 1 from public.admin_users where user_id = auth.uid()
+)) with check (exists (
+  select 1 from public.admin_users where user_id = auth.uid()
+));
+drop policy if exists "KNR admins can delete banners" on public.store_banners;
+create policy "KNR admins can delete banners" on public.store_banners
+for delete to authenticated using (exists (
+  select 1 from public.admin_users where user_id = auth.uid()
+));
+
+-- Las imágenes guardadas en el bucket público pueden verse desde la tienda.
+insert into storage.buckets (id,name,public,file_size_limit,allowed_mime_types)
+values ('product-media','product-media',true,10485760,array['image/jpeg','image/png','image/webp','image/avif'])
+on conflict (id) do update set public = true;
+drop policy if exists "Public can view KNR product media" on storage.objects;
+create policy "Public can view KNR product media" on storage.objects
+for select to anon, authenticated using (bucket_id = 'product-media');
