@@ -717,3 +717,20 @@ main#inicio{scroll-margin-top:82px}
 .empty-cart-browse{margin:5px auto 0;padding:10px 0;color:var(--accent);font-size:9px;font-weight:800;letter-spacing:1px}
 .empty-cart-browse:hover{color:var(--text)}
 @media(max-width:520px){.empty-cart{max-width:100%;padding:18px 0}.empty-cart-picks{margin-top:19px}.empty-cart-pick{grid-template-columns:44px minmax(0,1fr) 34px}.empty-cart-pick img{width:44px;height:50px}}
+
+
+/* Footer editorial: navegación y cierre responsive */
+.site-footer{display:grid;grid-template-columns:minmax(180px,1fr) auto minmax(220px,1fr);align-items:center;gap:28px;padding:38px 9%}
+.footer-brand{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+.footer-brand .logo{margin:0;font-size:27px}
+.footer-brand .footer-mantra{font-size:9px;font-weight:700}
+.footer-brand>small{color:var(--muted);font-size:7px;letter-spacing:1.4px}
+.footer-links{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:clamp(14px,2vw,28px)}
+.footer-links a{color:var(--muted);font-size:8px;font-weight:700;letter-spacing:1.1px;transition:color .18s}
+.footer-links a:hover,.footer-links a:focus-visible{color:var(--accent)}
+.footer-links a:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
+.footer-legal{display:flex;align-items:center;justify-content:flex-end;gap:20px;text-align:right}
+.footer-legal>span{font-size:7px;line-height:1.6}
+.footer-legal .back-to-top{white-space:nowrap}
+@media(max-width:900px){.site-footer{grid-template-columns:1fr auto}.footer-links{grid-column:1/-1;grid-row:2;justify-content:flex-start;padding-top:15px;border-top:1px solid var(--line)}.footer-legal{grid-column:2;grid-row:1}}
+@media(max-width:520px){.site-footer{grid-template-columns:1fr;gap:18px;padding:30px 6%}.footer-links{grid-column:1;grid-row:2;gap:18px;padding-top:16px}.footer-legal{grid-column:1;grid-row:3;justify-content:space-between;gap:12px;text-align:left}.footer-legal>span{max-width:190px}.footer-brand .logo{width:auto}}
