@@ -177,3 +177,5 @@
 #delivery-settings-panel .admin-muted{color:#b9b4aa}
 
 .order-priority-flag{display:inline-flex;align-items:center;margin-top:7px;padding:5px 8px;border:1px solid #c99a55;border-radius:4px;background:rgba(201,154,85,.12);color:#e6bd7e;font-size:9px;font-weight:800;letter-spacing:.08em}
+
+.admin-catalog-pricing{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:3px 0}.admin-catalog-pricing del{font-size:11px;color:#aaa49a}.admin-catalog-pricing strong{font-size:14px;color:#e4c58f}.admin-catalog-pricing em{font-style:normal;font-size:9px;font-weight:800;letter-spacing:.04em;color:#fff;background:#8e3030;padding:4px 6px;border-radius:3px}.admin-catalog-regular-price{font-size:13px;font-weight:700;color:#e4c58f}
