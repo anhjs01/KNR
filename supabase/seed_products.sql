@@ -4,7 +4,7 @@
 
 do $seed$
 begin
-  if not exists (select 1 from public.products where name in ('Noir Chronograph','Steel Horizon','Midnight Sport','Classic Gold','Urban Frame','KNR Essential Cap','KNR Street Cap','KNR Classic Cap','Scent No. 08')) then
+  if not exists (select 1 from public.products where name in ('Noir Chronograph','Steel Horizon','Midnight Sport','Classic Gold','Urban Frame','KNR Essential Cap','KNR Street Cap','KNR Classic Cap','Scent No. 08','Scent No. 12','Scent No. 21')) then
     insert into public.products
       (name, category, style, price, old_price, discount, tag, description, specs, image_urls, video_url, stock, track_inventory, reorder_level, reorder_quantity, active)
     values
@@ -69,6 +69,20 @@ begin
         'Una propuesta olfativa cálida y envolvente. Consulta las notas y concentración antes de elegir.',
         '["Familia aromática: amaderada*","Presentación de referencia","Verifica contenido y autenticidad"]'::jsonb,
         '["https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=1000&q=85"]'::jsonb,
+        null, 0, false, 5, 10, true
+      ),
+      (
+        'Scent No. 12', 'Perfumería', 'urban', 119000, 139000, 14, 'SELECCIÓN KNR',
+        'Una fragancia de carácter fresco y moderno, pensada para acompañar el día con una presencia limpia y versátil.',
+        '["Perfil fresco y moderno","Presentación de referencia","Consulta disponibilidad y contenido"]'::jsonb,
+        '["https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=1000&q=85"]'::jsonb,
+        null, 0, false, 5, 10, true
+      ),
+      (
+        'Scent No. 21', 'Perfumería', 'luxury', 159000, null, 0, 'EDICIÓN SELECTA',
+        'Una propuesta intensa y elegante para quienes prefieren aromas con personalidad y una estela memorable.',
+        '["Perfil cálido e intenso","Presentación de referencia","Consulta disponibilidad y contenido"]'::jsonb,
+        '["https://images.unsplash.com/photo-1615634260167-c8cdede054de?auto=format&fit=crop&w=1000&q=85"]'::jsonb,
         null, 0, false, 5, 10, true
       );
   end if;
