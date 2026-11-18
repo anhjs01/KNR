@@ -161,3 +161,6 @@ begin
 end;
 $$;
 grant execute on function public.place_order(jsonb,jsonb,jsonb) to anon, authenticated;
+
+-- Recarga el esquema de PostgREST para que la API detecte store_settings y los cambios.
+notify pgrst, 'reload schema';
