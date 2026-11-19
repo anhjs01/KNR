@@ -147,16 +147,24 @@ export default function Admin(){
    const percentage=Math.round(Math.min(90,Math.max(0,Number(form.discount)||0)));
    if(form.is_offer&&percentage<=0)throw new Error('Para activar una oferta, asigna también un descuento mayor que 0%.');
    const payload={name:form.name.trim(),category:form.category,style:form.style,price:Math.round(basePrice*(1-percentage/100)),old_price:percentage>0?Math.round(basePrice):null,discount:percentage,is_offer:!!form.is_offer,tag:form.tag,description:form.description,specs:form.specs.split('\n').map(x=>x.trim()).filter(Boolean),image_urls,video_url:form.video_url||null,stock:Math.max(0,Math.floor(Number(form.stock)||0)),track_inventory:!!form.track_inventory,reorder_level:Math.max(0,Math.floor(Number(form.reorder_level)||0)),reorder_quantity:Math.max(1,Math.floor(Number(form.reorder_quantity)||1)),active:form.active};
-   const result=editing
+   let result=editing
     ?await supabase.from('products').update(payload).eq('id',editing).select('*').single()
     :await supabase.from('products').insert(payload).select('*').single();
+   let offerColumnMissing=false;
+   if(result.error&&/is_offer|schema cache|column .* not found/i.test(result.error.message||'')){
+    const compatiblePayload={...payload};delete compatiblePayload.is_offer;
+    result=editing
+     ?await supabase.from('products').update(compatiblePayload).eq('id',editing).select('*').single()
+     :await supabase.from('products').insert(compatiblePayload).select('*').single();
+    offerColumnMissing=!result.error;
+   }
    if(result.error)throw new Error('Supabase rechazó el producto: '+result.error.message);
    if(!result.data?.id)throw new Error('Supabase no devolvió el producto guardado. No se puede confirmar el registro.');
    const productId=result.data.id;
-   const savedProduct=result.data;
+   const savedProduct={...result.data,is_offer:!!result.data.is_offer};
    setItems(current=>editing?current.map(item=>item.id===productId?savedProduct:item):[savedProduct,...current]);
    setForm(blank);setFiles([]);setEditing(null);
-   setNotice(payload.active?(editing?'Cambios guardados y publicados. La tienda pública recibirá la actualización automáticamente.':'¡Producto publicado! Ya está disponible para los visitantes de la tienda.'):(editing?'Cambios guardados. El producto permanece oculto para los visitantes.':'Producto guardado como oculto; actívalo desde el catálogo cuando quieras publicarlo.'));
+   setNotice((payload.active?(editing?'Cambios guardados y publicados. La tienda pública recibirá la actualización automáticamente.':'¡Producto publicado! Ya está disponible para los visitantes de la tienda.'):(editing?'Cambios guardados. El producto permanece oculto para los visitantes.':'Producto guardado como oculto; actívalo desde el catálogo cuando quieras publicarlo.'))+(offerColumnMissing?' Atención: se guardó sin la opción de oferta porque falta la columna is_offer en Supabase. Ejecuta supabase/offers.sql para activar esa función.':''));
    document.getElementById('product-editor')?.scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){setError(e.message||'No se pudo guardar el producto. Revisa la conexión y los permisos de Supabase.')}
   finally{setSavingProduct(false)}
