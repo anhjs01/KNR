@@ -889,3 +889,26 @@ main#inicio{scroll-margin-top:82px}
  .combo-detail-content{padding:20px}
  .combo-detail-description-text{margin:14px 0}
 }
+
+
+/* KNR Combo Studio: compactar acciones y alinearlas con el lenguaje visual de la tienda. */
+.combo-product-card{grid-template-columns:96px minmax(0,1fr);gap:13px;padding:12px;border-radius:2px}
+.combo-product-image{height:112px;border-radius:0}
+.combo-product-info{gap:5px}
+.combo-product-info>strong{font-size:12px;line-height:1.35;letter-spacing:.01em}
+.combo-product-info>b{font-size:12px}
+.combo-product-actions{display:flex;align-items:center;justify-content:flex-start;gap:7px;width:auto;margin-top:5px}
+.combo-details-toggle,.combo-add-product{flex:0 0 auto;width:auto;min-height:29px;padding:6px 9px;border-radius:0;font-size:7px;font-weight:800;letter-spacing:.55px;line-height:1;white-space:nowrap}
+.combo-details-toggle{border:1px solid var(--line);background:transparent;color:var(--muted)}
+.combo-details-toggle:hover{border-color:var(--accent);background:transparent;color:var(--accent)}
+.combo-add-product{border:1px solid var(--accent);background:var(--accent);color:#111}
+.combo-add-product:hover:not(:disabled){filter:brightness(1.08)}
+.combo-add-product:disabled{opacity:.4}
+@media(max-width:720px){
+ .combo-product-card{grid-template-columns:78px minmax(0,1fr);gap:10px;padding:9px}
+ .combo-product-image{height:96px}
+ .combo-product-info>strong{font-size:11px}
+ .combo-product-info>b{font-size:11px}
+ .combo-product-actions{flex-wrap:wrap;gap:6px}
+ .combo-details-toggle,.combo-add-product{min-height:27px;padding:6px 8px;font-size:7px}
+}
