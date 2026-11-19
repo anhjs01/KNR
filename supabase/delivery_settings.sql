@@ -37,8 +37,8 @@ for select to anon, authenticated using (true);
 drop policy if exists "KNR admins manage delivery settings" on public.store_settings;
 create policy "KNR admins manage delivery settings" on public.store_settings
 for all to authenticated
-using (exists(select 1 from public.admin_users where user_id=auth.uid()))
-with check (exists(select 1 from public.admin_users where user_id=auth.uid()));
+using (public.is_knr_admin())
+with check (public.is_knr_admin());
 
 alter table public.orders add column if not exists shipping_cost integer not null default 0 check (shipping_cost >= 0);
 alter table public.orders add column if not exists priority_fee integer not null default 0 check (priority_fee >= 0);
