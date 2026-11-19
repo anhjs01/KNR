@@ -62,12 +62,19 @@ grant insert, update, delete on public.store_banners to authenticated;
 grant insert, update, delete on storage.objects to authenticated;
 
 alter table public.products enable row level security;
+-- Separar la lectura anónima de la comprobación de administrador.
+-- Así los visitantes no necesitan permisos sobre admin_users para ver el catálogo.
 drop policy if exists "Public can view active KNR products" on public.products;
+drop policy if exists "Authenticated can view active KNR products" on public.products;
+drop policy if exists "KNR admins can view all KNR products" on public.products;
 create policy "Public can view active KNR products" on public.products
-for select to anon, authenticated
-using (active = true or exists (
-  select 1 from public.admin_users where user_id = auth.uid()
-));
+for select to anon using (active = true);
+create policy "Authenticated can view active KNR products" on public.products
+for select to authenticated using (active = true);
+create policy "KNR admins can view all KNR products" on public.products
+for select to authenticated using (
+  exists (select 1 from public.admin_users where user_id = auth.uid())
+);
 
 drop policy if exists "KNR admins can insert products" on public.products;
 create policy "KNR admins can insert products" on public.products
@@ -88,11 +95,19 @@ for delete to authenticated using (
 );
 
 alter table public.store_banners enable row level security;
+-- La lectura pública no consulta admin_users; los administradores autenticados
+-- conservan una política independiente para ver todos los banners.
 drop policy if exists "Public can view active KNR banners" on public.store_banners;
+drop policy if exists "Authenticated can view active KNR banners" on public.store_banners;
+drop policy if exists "KNR admins can view all KNR banners" on public.store_banners;
 create policy "Public can view active KNR banners" on public.store_banners
-for select to anon, authenticated using (active = true or exists (
-  select 1 from public.admin_users where user_id = auth.uid()
-));
+for select to anon using (active = true);
+create policy "Authenticated can view active KNR banners" on public.store_banners
+for select to authenticated using (active = true);
+create policy "KNR admins can view all KNR banners" on public.store_banners
+for select to authenticated using (
+  exists (select 1 from public.admin_users where user_id = auth.uid())
+);
 drop policy if exists "KNR admins can insert banners" on public.store_banners;
 create policy "KNR admins can insert banners" on public.store_banners
 for insert to authenticated with check (exists (
